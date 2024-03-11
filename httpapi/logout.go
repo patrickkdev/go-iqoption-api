@@ -1,9 +1,7 @@
 package httpapi
 
-import utils "github.com/patrickkdev/Go-IQOption-API/httpapi/utils"
-
-func Logout(url string) error {
-	resp, err := utils.PostFromStruct(url, nil)
+func Logout(url string, session *Session) error {
+	resp, err := session.PostFromStruct(url, nil, nil)
 
 	if err != nil {
 		return err

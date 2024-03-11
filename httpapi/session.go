@@ -6,7 +6,12 @@ import (
 	"net/http"
 )
 
-func PostFromStruct(url string, data interface{}) (*http.Response, error) {
+type Session struct {
+	Headers map[string]string `json:"header"`
+	Cookie string            `json:"cookie"`
+}
+
+func (sD *Session) PostFromStruct(url string, data interface{}, customHeaders map[string]string) (*http.Response, error) {
 	var jsonBody []byte = []byte{}
 	if data != nil {
 		var err error // Declare error for later use
@@ -23,6 +28,18 @@ func PostFromStruct(url string, data interface{}) (*http.Response, error) {
 	}
 
 	request.Header.Set("Content-Type", "application/json")
+	
+	if sD.Cookie != "" {
+		request.Header.Set("Cookie", sD.Cookie)
+	}
+
+	for key, value := range sD.Headers {
+		request.Header.Set(key, value)
+	}
+
+	for key, value := range customHeaders {
+		request.Header.Set(key, value)
+	}
 
 	client := &http.Client{}
 	resp, err := client.Do(request)
