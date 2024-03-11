@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"patrickkdev/Go-IQOption-API/api"
 	"patrickkdev/Go-IQOption-API/utils"
 	"patrickkdev/Go-IQOption-API/wsapi"
@@ -28,15 +29,15 @@ func main() {
 
 	user.Subscribe("heartbeat", func(event wsapi.WSEvent) {
 		now := time.Now()
-		unixTime := now.Unix()  // Convert to float64 for decimal part
-		nanoseconds := int(float64(now.UnixNano()) / 1e9)
+		unixTime := now.UnixNano() // Convert to float64 for decimal part
+		requestId := fmt.Sprint(unixTime)[10:18]
 
 		utils.PrintMapAsJSON(event)
 		heartbeatAnswer := wsapi.HeartbeatEvent(
-			int(event["msg"].(float64)), 
+			int(event["msg"].(float64)),
 			int(unixTime),
-			nanoseconds,
-		) 
+			requestId,
+		)
 		utils.PrintMapAsJSON(heartbeatAnswer)
 
 		user.SendEvent(heartbeatAnswer)

@@ -10,19 +10,19 @@ import (
 )
 
 type BrokerClient struct {
-	LoginData *httpapi.LoginData
-	Session *httpapi.Session
-	HostData  *data.Host
-	WebSocket *wsapi.WSocket
+	LoginData     *httpapi.LoginData
+	Session       *httpapi.Session
+	HostData      *data.Host
+	WebSocket     *wsapi.WSocket
 	EventHandlers map[string]wsapi.WSEventCallback
 }
 
-func NewBrokerClient(hostName string) *BrokerClient { 
+func NewBrokerClient(hostName string) *BrokerClient {
 	return &BrokerClient{
 		HostData: data.GetHostData(hostName),
 		Session: &httpapi.Session{
 			Headers: nil,
-			Cookie: "",
+			Cookie:  "",
 		},
 		EventHandlers: make(map[string]wsapi.WSEventCallback),
 	}
@@ -51,7 +51,7 @@ func (bC *BrokerClient) Logout() error {
 }
 
 func (bC *BrokerClient) ConnectSocket() (*sync.WaitGroup, error) {
-	socketConnection, err := wsapi.NewSocketConnection("ws://localhost:8080") //(bC.HostData.WSAPIURL)
+	socketConnection, err := wsapi.NewSocketConnection(bC.HostData.WSAPIURL)
 	if err != nil {
 		return nil, err
 	}
