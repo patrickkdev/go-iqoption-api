@@ -35,7 +35,7 @@ func (bC *BrokerClient) Login(email string, password string, token *string) (*Br
 		Token:      token,
 	}
 
-	err := httpapi.Login(bC.HostData.LoginURL, bC.Session, & data)
+	err := httpapi.Login(bC.HostData.LoginURL, bC.Session, &data)
 
 	if err != nil {
 		return nil, err
