@@ -2,7 +2,7 @@ package IQApi
 
 import (
 	"github.com/patrickkdev/Go-IQOption-API/data"
-	httpapi "github.com/patrickkdev/Go-IQOption-API/http"
+	"github.com/patrickkdev/Go-IQOption-API/httpapi"
 )
 
 type BrokerClient struct {
@@ -11,7 +11,7 @@ type BrokerClient struct {
 }
 
 func NewBrokerClient(hostName string) *BrokerClient {
-	hostData := Data.GetHostData(hostName)
+	hostData := data.GetHostData(hostName)
 	return &BrokerClient{
 		HostData: hostData,
 	}
@@ -33,4 +33,8 @@ func (bC *BrokerClient) Login(email string, password string, token *string) (*Br
 	bC.LoginData = data
 
 	return bC, nil
+}
+
+func (bC *BrokerClient) Logout() error {
+	return httpapi.Logout(bC.HostData.LogoutURL)
 }

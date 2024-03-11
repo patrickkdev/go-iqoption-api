@@ -6,10 +6,14 @@ import (
 	"net/http"
 )
 
-func PostJson(url string, data interface{}) (*http.Response, error) {
-	jsonBody, err := json.Marshal(data)
-	if err != nil {
-		return nil, err
+func PostFromStruct(url string, data interface{}) (*http.Response, error) {
+	var jsonBody []byte = []byte{}
+	if data != nil {
+		var err error // Declare error for later use
+		jsonBody, err = json.Marshal(data)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
