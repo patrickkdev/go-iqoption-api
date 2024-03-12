@@ -1,6 +1,6 @@
 package wsapi
 
-func GetUserProfileClient(ws *WSocket, userId int) error {
+func GetUserProfileClient(ws *Socket, userId int) error {
 	event := map[string]interface{}{
 		"name": "get-user-profile-client",
 		"body": map[string]interface{}{

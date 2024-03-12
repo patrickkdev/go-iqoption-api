@@ -3,26 +3,32 @@ package wsapi
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"sync"
 
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 )
 
-type WSEvent map[string]interface{}
+type EventCallback func(event Event)
 
-type WSEventCallback func(event WSEvent)
-
-type WSocket struct {
-	Conn *websocket.Conn
+type Socket struct {
+	Conn   *websocket.Conn
 	Closed bool
-	ctx context.Context
+	ctx    context.Context
 }
 
-func NewSocketConnection(url string) (*WSocket, error) {
+func NewSocketConnection(url string) (*Socket, error) {
 	ctx := context.Background()
 
-	conn, _, err := websocket.Dial(ctx, url, nil)
+	var header http.Header = http.Header{}
+	header.Add("check_hostname", "false")
+	header.Add("cert_reqs", "none")
+	header.Add("ca_certs", "cacert.pem")
+
+	conn, _, err := websocket.Dial(ctx, url, &websocket.DialOptions{
+		HTTPHeader: header,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -31,10 +37,10 @@ func NewSocketConnection(url string) (*WSocket, error) {
 		println("conn is nil")
 	}
 
-	newSocketConnection := &WSocket{
-		Conn: conn,
+	newSocketConnection := &Socket{
+		Conn:   conn,
 		Closed: false,
-		ctx: ctx,
+		ctx:    ctx,
 	}
 
 	println("new socket connection: ")
@@ -42,19 +48,19 @@ func NewSocketConnection(url string) (*WSocket, error) {
 	return newSocketConnection, nil
 }
 
-func (ws *WSocket) Close() {
+func (ws *Socket) Close() {
 	ws.Conn.Close(websocket.StatusNormalClosure, "close")
 }
 
-func (ws *WSocket) Write(event interface{}) () {
+func (ws *Socket) Write(event interface{}) {
 	wsjson.Write(ws.ctx, ws.Conn, event)
 }
 
-func (ws *WSocket) Listen(wg *sync.WaitGroup, handleEvent WSEventCallback) () {
+func (ws *Socket) Listen(wg *sync.WaitGroup, handleEvent EventCallback) {
 	defer wg.Done()
 
 	var errorCount int = 0
-	var message map[string]interface{}
+	var message Event
 
 	for {
 		if ws.Closed {

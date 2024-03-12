@@ -13,18 +13,20 @@ type BrokerClient struct {
 	LoginData     *httpapi.LoginData
 	Session       *httpapi.Session
 	HostData      *data.Host
-	WebSocket     *wsapi.WSocket
-	EventHandlers map[string]wsapi.WSEventCallback
+	WebSocket     *wsapi.Socket
+	EventHandlers map[string]wsapi.EventCallback
+	TimeSync      *wsapi.Timesync
 }
 
 func NewBrokerClient(hostName string) *BrokerClient {
 	return &BrokerClient{
-		HostData: data.GetHostData(hostName),
+		HostData:      data.GetHostData(hostName),
+		EventHandlers: make(map[string]wsapi.EventCallback),
+		TimeSync:      wsapi.NewTimesync(),
 		Session: &httpapi.Session{
 			Headers: nil,
 			Cookie:  "",
 		},
-		EventHandlers: make(map[string]wsapi.WSEventCallback),
 	}
 }
 
@@ -66,22 +68,16 @@ func (bC *BrokerClient) ConnectSocket() (*sync.WaitGroup, error) {
 	return wg, nil
 }
 
-func (bC *BrokerClient) Subscribe(name string, callback wsapi.WSEventCallback) {
+func (bC *BrokerClient) Subscribe(name string, callback wsapi.EventCallback) {
 	bC.EventHandlers[name] = callback
 }
 
-func (bC *BrokerClient) SendEvent(event interface{}) {
+func (bC *BrokerClient) SendEvent(event *wsapi.Event) {
 	bC.WebSocket.Write(event)
 }
 
-func (bC *BrokerClient) HandleEvent(event wsapi.WSEvent) {
-	eventName, ok := event["name"].(string)
-	if !ok {
-		utils.PrintlnIfVerbose("no event name")
-		return
-	}
-
-	callback, ok := bC.EventHandlers[eventName]
+func (bC *BrokerClient) HandleEvent(event wsapi.Event) {
+	callback, ok := bC.EventHandlers[event.Name]
 	if !ok {
 		utils.PrintlnIfVerbose("no event callback")
 		return
