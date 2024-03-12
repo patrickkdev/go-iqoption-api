@@ -2,20 +2,24 @@ package wsapi
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"patrickkdev/Go-IQOption-API/debug"
 	"sync"
 
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 )
 
-type EventCallback func(event Event)
+type EventCallback func(event []byte)
 
 type Socket struct {
 	Conn   *websocket.Conn
 	Closed bool
+	eventHandlers map[string]EventCallback
 	ctx    context.Context
+	WaitGroup		 *sync.WaitGroup
 }
 
 func NewSocketConnection(url string) (*Socket, error) {
@@ -34,16 +38,22 @@ func NewSocketConnection(url string) (*Socket, error) {
 	}
 
 	if conn == nil {
-		println("conn is nil")
+		debug.IfVerbose.Println("conn is nil")
 	}
 
 	newSocketConnection := &Socket{
-		Conn:   conn,
-		Closed: false,
-		ctx:    ctx,
+		eventHandlers: 	make(map[string]EventCallback),
+		ctx:    				ctx,
+		Conn:   				conn,
+		Closed: 				false,
+		WaitGroup:     	new(sync.WaitGroup),
 	}
 
-	println("new socket connection: ")
+	debug.IfVerbose.Println("new socket connection: ")
+
+	newSocketConnection.WaitGroup.Add(1)
+
+	go newSocketConnection.Listen()
 
 	return newSocketConnection, nil
 }
@@ -52,15 +62,51 @@ func (ws *Socket) Close() {
 	ws.Conn.Close(websocket.StatusNormalClosure, "close")
 }
 
-func (ws *Socket) Write(event interface{}) {
+func (ws *Socket) EmitEvent(event interface{}) {
 	wsjson.Write(ws.ctx, ws.Conn, event)
 }
 
-func (ws *Socket) Listen(wg *sync.WaitGroup, handleEvent EventCallback) {
-	defer wg.Done()
+func (ws *Socket) AddEventListener(name string, callback EventCallback) {
+	ws.eventHandlers[name] = callback
+}
+
+func (ws *Socket) RemoveEventListener(name string) {
+	delete(ws.eventHandlers, name)
+}
+
+func (ws *Socket) handleEvent(eventB []byte) {
+	reportEventError := func(errMessage string) {
+		debug.IfVerbose.Println(errMessage)
+		debug.IfVerbose.PrintAsJSON(eventB)
+	}
+
+	event := new(struct{Name string `json:"name"`; Result interface{} `json:"result"`});
+	err := json.Unmarshal([]byte(eventB), &event)
+
+	if err != nil {
+		reportEventError("error unmarshalling event")
+		return
+	}
+
+	eventName := event.Name
+
+	if eventName == "profile" {
+		debug.PrintAsJSON(event)
+	}
+	
+	callback, ok := ws.eventHandlers[eventName]
+	if !ok {
+		reportEventError("no callback found for event: " + eventName)
+		return
+	}
+
+	callback(eventB)
+}
+
+func (ws *Socket) Listen() {
+	defer ws.WaitGroup.Done()
 
 	var errorCount int = 0
-	var message Event
 
 	for {
 		if ws.Closed {
@@ -74,13 +120,14 @@ func (ws *Socket) Listen(wg *sync.WaitGroup, handleEvent EventCallback) {
 			continue
 		}
 
-		err := wsjson.Read(ws.ctx, ws.Conn, &message)
+		_, message, err := ws.Conn.Read(ws.ctx)
+
 		if err != nil {
 			fmt.Println("error reading ws event:", err)
 			errorCount++
 			continue
 		}
 
-		handleEvent(message)
+		ws.handleEvent(message)
 	}
 }

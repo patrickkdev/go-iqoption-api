@@ -4,21 +4,29 @@ import (
 	"time"
 )
 
+type TimesyncEvent struct {
+	ClientSessionID string `json:"client_session_id"`
+	Msg             int64  `json:"msg"`
+	Name            string `json:"name"`
+	RequestID       string `json:"request_id"`
+	SessionID       string `json:"session_id"`
+}
+
 type Timesync struct {
 	Name            string
-	serverTimestamp float64
+	serverTimestamp int64
 	expirationTime  int
 }
 
 func NewTimesync() *Timesync {
 	return &Timesync{
 		Name:            "timeSync",
-		serverTimestamp: float64(time.Now().UnixMicro()),
+		serverTimestamp: time.Now().UnixNano(),
 		expirationTime:  1,
 	}
 }
 
-func (t *Timesync) GetServerTimestamp() float64 {
+func (t *Timesync) GetServerTimestamp() int64 {
 	return t.serverTimestamp / 1000
 }
 
@@ -26,7 +34,7 @@ func (t *Timesync) GetServerDatetime() time.Time {
 	return time.Unix(int64(t.serverTimestamp), 0)
 }
 
-func (t *Timesync) SetServerTimestamp(timestamp float64) {
+func (t *Timesync) SetServerTimestamp(timestamp int64) {
 	t.serverTimestamp = timestamp
 }
 

@@ -7,8 +7,13 @@ import (
 )
 
 type Session struct {
-	Headers map[string]string `json:"header"`
-	Cookie string            `json:"cookie"`
+	Code   					string  `json:"code"`
+	SSID  					string  `json:"ssid"`
+	ClientSessionID string 	`json:"client_session_id"`
+}
+
+func NewSession() *Session {
+	return &Session{}
 }
 
 func (sD *Session) PostFromStruct(url string, data interface{}, customHeaders map[string]string) (*http.Response, error) {
@@ -28,14 +33,6 @@ func (sD *Session) PostFromStruct(url string, data interface{}, customHeaders ma
 	}
 
 	request.Header.Set("Content-Type", "application/json")
-	
-	if sD.Cookie != "" {
-		request.Header.Set("Cookie", sD.Cookie)
-	}
-
-	for key, value := range sD.Headers {
-		request.Header.Set(key, value)
-	}
 
 	for key, value := range customHeaders {
 		request.Header.Set(key, value)

@@ -1,12 +1,12 @@
 package api
 
 import (
-	"sync"
-
+	"encoding/json"
 	"patrickkdev/Go-IQOption-API/data"
+	"patrickkdev/Go-IQOption-API/debug"
 	"patrickkdev/Go-IQOption-API/httpapi"
-	"patrickkdev/Go-IQOption-API/utils"
 	"patrickkdev/Go-IQOption-API/wsapi"
+	"time"
 )
 
 type BrokerClient struct {
@@ -23,10 +23,7 @@ func NewBrokerClient(hostName string) *BrokerClient {
 		HostData:      data.GetHostData(hostName),
 		EventHandlers: make(map[string]wsapi.EventCallback),
 		TimeSync:      wsapi.NewTimesync(),
-		Session: &httpapi.Session{
-			Headers: nil,
-			Cookie:  "",
-		},
+		Session:       httpapi.NewSession(),
 	}
 }
 
@@ -52,40 +49,63 @@ func (bC *BrokerClient) Logout() error {
 	return httpapi.Logout(bC.HostData.LogoutURL, bC.Session)
 }
 
-func (bC *BrokerClient) ConnectSocket() (*sync.WaitGroup, error) {
+func (bC *BrokerClient) ConnectSocket() error {
 	socketConnection, err := wsapi.NewSocketConnection(bC.HostData.WSAPIURL)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	bC.WebSocket = socketConnection
+	
+	// Handle heartbeat
+	bC.WebSocket.AddEventListener("heartbeat", func(event []byte) {
+		var heartbeatFromServer wsapi.Heartbeat
+		json.Unmarshal(event, &heartbeatFromServer)
 
-	wg := new(sync.WaitGroup)
-	wg.Add(1)
+		wsapi.AnswerHeartbeat(bC.WebSocket, heartbeatFromServer, bC.TimeSync.GetServerTimestamp())
+	})
 
-	go bC.WebSocket.Listen(wg, bC.HandleEvent)
+	// Handle heartbeat
+	bC.WebSocket.AddEventListener("timeSync", func(event []byte) {
+		var timesyncEvent wsapi.TimesyncEvent
+		json.Unmarshal(event, &timesyncEvent)
 
-	return wg, nil
-}
+		bC.TimeSync.SetServerTimestamp(timesyncEvent.Msg)
+	})
 
-func (bC *BrokerClient) Subscribe(name string, callback wsapi.EventCallback) {
-	bC.EventHandlers[name] = callback
-}
+	// Handle authentication
+	resp, err := wsapi.Authenticate(
+		bC.WebSocket,
+		bC.Session.SSID, 
+		int(bC.TimeSync.GetServerTimestamp()*1000),
+		time.Now().Add(5 * time.Second),
+	)
 
-func (bC *BrokerClient) SendEvent(event *wsapi.Event) {
-	bC.WebSocket.Write(event)
-}
+	debug.PrintAsJSON(resp)
 
-func (bC *BrokerClient) HandleEvent(event wsapi.Event) {
-	callback, ok := bC.EventHandlers[event.Name]
-	if !ok {
-		utils.PrintlnIfVerbose("no event callback")
-		return
+	if err != nil {
+		debug.IfVerbose.Println("Authentication error: ", err.Error())
+		bC.WebSocket.Close()
+		bC.WebSocket.WaitGroup.Done()
+		return err
 	}
 
-	callback(event)
+	return nil
 }
 
-func (bC *BrokerClient) Close() {
-	bC.WebSocket.Close()
+func (bC *BrokerClient) GetCoreProfile() (*wsapi.CoreProfile, error) {
+	return wsapi.GetCoreProfile(
+		bC.WebSocket, 
+		bC.TimeSync.GetServerTimestamp(), 
+		time.Now().Add(5 * time.Second),
+	)
+}
+
+func (bC *BrokerClient) GetProfileClient(userId int) (*wsapi.UserProfileClient, error) {
+	return wsapi.GetUserProfileClient(
+		bC.WebSocket,
+		userId,
+		bC.TimeSync.GetServerTimestamp(),
+		time.Now().Add(5 * time.Second),
+	)
 }

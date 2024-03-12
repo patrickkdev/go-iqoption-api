@@ -3,47 +3,41 @@ package main
 import (
 	"fmt"
 	"patrickkdev/Go-IQOption-API/api"
-	"patrickkdev/Go-IQOption-API/utils"
+	"patrickkdev/Go-IQOption-API/debug"
 	"patrickkdev/Go-IQOption-API/wsapi"
-	"time"
 )
 
 func main() {
-	utils.PrintlnIfVerbose("Hi mom!")
+	debug.IfVerbose.Println("Hi mom!")
 
-	userConnection, err := api.NewBrokerClient("iqoption.com").
-		Login("patrickfxtrader8q@gmail.com", "YOUTAP2019", nil)
+	userConnection, err := 	api.NewBrokerClient("iqoption.com").
+															Login("patrickfxtrader8q@gmail.com", "YOUTAP2019", nil)
 
 	if err != nil {
 		panic(err)
 	}
 
-	wg, err := userConnection.ConnectSocket()
+	err = userConnection.ConnectSocket()
 	if err != nil {
 		panic(err)
 	}
 
-	userConnection.Subscribe("heartbeat", func(event wsapi.Event) {
-		now := time.Now()
-		unixTime := now.UnixNano()
-		requestId := fmt.Sprint(unixTime)[10:18]
+	coreProfile, err := userConnection.GetCoreProfile()
+	if err != nil {
+		panic(err)
+	}
 
-		heartbeatTime := int(event.Msg.(float64))
+	println("Login successful")
+	fmt.Printf("Hi, %s %s\n", coreProfile.Msg.Result.FirstName, coreProfile.Msg.Result.LastName)
 
-		utils.PrintlnIfVerbose("Received heartbeat event at:", int(event.Msg.(float64)))
+	userProfileClient, err := userConnection.GetProfileClient(int(coreProfile.Msg.Result.ID))
+	if err != nil {
+		panic(err)
+	}
 
-		heartbeatAnswer := wsapi.NewEvent(
-			"heartbeat",
-			map[string]interface{}{
-				"heartbeatTime": heartbeatTime,
-				"userTime":      int(userConnection.TimeSync.GetServerTimestamp() * 1000),
-			},
-			requestId,
-		)
+	fmt.Println("Profile: ", userProfileClient.Msg.ImgURL)
 
-		userConnection.SendEvent(heartbeatAnswer)
-		utils.PrintMapAsJSON(heartbeatAnswer.Msg.(map[string]interface{}))
-	})
+	wsapi.TradeDigital(userConnection.WebSocket, 342, 76, 112647980, int(userConnection.TimeSync.GetServerTimestamp()))
 
-	wg.Wait()
+	userConnection.WebSocket.WaitGroup.Wait()
 }

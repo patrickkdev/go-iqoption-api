@@ -1,5 +1,10 @@
 package httpapi
 
+import (
+	"encoding/json"
+	"patrickkdev/Go-IQOption-API/debug"
+)
+
 type LoginData struct {
 	Identifier string  `json:"identifier"`
 	Password   string  `json:"password"`
@@ -14,6 +19,14 @@ func Login(url string, session *Session, data *LoginData) error {
 	}
 
 	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&session)
+
+	if err != nil {
+		return err
+	}
+
+	debug.IfVerbose.PrintAsJSON(session)
 
 	return nil
 }

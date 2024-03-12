@@ -1,15 +1,33 @@
 package wsapi
 
-import "fmt"
+import (
+	"fmt"
+	"patrickkdev/Go-IQOption-API/debug"
+	"time"
+)
 
-func HeartbeatEvent(heartBeatTime int, userTime int, requestId string) (hbEvent map[string]interface{}) {
-	event := map[string]interface{}{
-		"name": "heartbeat",
-		"msg": map[string]string{
-			"heartbeatTime": fmt.Sprint(heartBeatTime),
-			"userTime":      fmt.Sprint(userTime),
-		},
-		"request_id": requestId,
-	}
-	return event
+type Heartbeat struct {
+	Name string `json:"name"`
+	Msg  int 		`json:"msg"`
+}
+
+func AnswerHeartbeat(ws *Socket, heartbeatFromServer Heartbeat, serverTimestamp int64) {
+		now := time.Now()
+		unixTime := now.UnixNano()
+		requestId := fmt.Sprint(unixTime)[10:18]
+	
+		heartbeatTime := int(heartbeatFromServer.Msg)
+
+		debug.If(bool(debug.IfVerbose) && false).Println("Received heartbeat from server at:", int(heartbeatTime))
+	
+		heartbeatFromClient := &Event{
+			RequestId: requestId,
+			Name:      "heartbeat",
+			Msg:       map[string]interface{}{
+				"heartbeatTime": heartbeatTime,
+				"userTime":      serverTimestamp * 1000,
+			},
+		}
+	
+		ws.EmitEvent(heartbeatFromClient)
 }
