@@ -15,11 +15,11 @@ import (
 type EventCallback func(event []byte)
 
 type Socket struct {
-	Conn   *websocket.Conn
-	Closed bool
+	Conn          *websocket.Conn
+	Closed        bool
 	eventHandlers map[string]EventCallback
-	ctx    context.Context
-	WaitGroup		 *sync.WaitGroup
+	ctx           context.Context
+	WaitGroup     *sync.WaitGroup
 }
 
 func NewSocketConnection(url string) (*Socket, error) {
@@ -42,11 +42,11 @@ func NewSocketConnection(url string) (*Socket, error) {
 	}
 
 	newSocketConnection := &Socket{
-		eventHandlers: 	make(map[string]EventCallback),
-		ctx:    				ctx,
-		Conn:   				conn,
-		Closed: 				false,
-		WaitGroup:     	new(sync.WaitGroup),
+		eventHandlers: make(map[string]EventCallback),
+		ctx:           ctx,
+		Conn:          conn,
+		Closed:        false,
+		WaitGroup:     new(sync.WaitGroup),
 	}
 
 	debug.IfVerbose.Println("new socket connection: ")
@@ -80,23 +80,21 @@ func (ws *Socket) handleEvent(eventB []byte) {
 		debug.IfVerbose.PrintAsJSON(eventB)
 	}
 
-	event := new(struct{Name string `json:"name"`; Result interface{} `json:"result"`});
-	err := json.Unmarshal([]byte(eventB), &event)
+	event := new(struct {
+		Name   string      `json:"name"`
+		Result interface{} `json:"result"`
+	})
+
+	err := json.Unmarshal(eventB, &event)
 
 	if err != nil {
 		reportEventError("error unmarshalling event")
 		return
 	}
 
-	eventName := event.Name
-
-	if eventName == "profile" {
-		debug.PrintAsJSON(event)
-	}
-	
-	callback, ok := ws.eventHandlers[eventName]
+	callback, ok := ws.eventHandlers[event.Name]
 	if !ok {
-		reportEventError("no callback found for event: " + eventName)
+		reportEventError("no callback found for event: " + event.Name)
 		return
 	}
 
