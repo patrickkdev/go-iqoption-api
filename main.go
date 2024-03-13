@@ -21,7 +21,19 @@ func main() {
 	fmt.Println("Profile: ")
 	debug.PrintAsJSON(profile)
 
-	wsapi.TradeDigital(userConnection.WebSocket, 342, 76, 112647980, int(userConnection.TimeSync.GetServerTimestamp()))
+	balances, err := wsapi.GetBalances(userConnection.WebSocket, int(userConnection.TimeSync.GetServerTimestamp()))
+	if err != nil {
+		panic(err)
+	}
+
+	demoAccBalance, err := balances.FindByType(4)
+	if err != nil {
+		panic(err)
+	}
+
+	debug.PrintAsJSON(demoAccBalance)
+
+	wsapi.TradeBinary(userConnection.WebSocket, 50, 1, int(demoAccBalance.ID), int(userConnection.TimeSync.GetServerTimestamp()))
 
 	userConnection.WebSocket.WaitGroup.Wait()
 }

@@ -7,20 +7,20 @@ import (
 
 type CoreProfile struct {
 	ClientSessionID string `json:"client_session_id"`
-	Msg             Msg    `json:"msg"`              
+	Msg             msg    `json:"msg"`              
 	Name            string `json:"name"`             
 	RequestID       string `json:"request_id"`       
 	SessionID       string `json:"session_id"`       
 	Status          int64  `json:"status"`           
 }
 
-type Msg struct {
+type msg struct {
 	IsSuccessful bool          `json:"isSuccessful"`
 	Message      []interface{} `json:"message"`     
-	Result       Result        `json:"result"`      
+	Result       result        `json:"result"`      
 }
 
-type Result struct {
+type result struct {
 	AccountStatus         string             `json:"account_status"`         
 	Address               string             `json:"address"`                
 	AuthTwoFactor         interface{}        `json:"auth_two_factor"`        
@@ -62,7 +62,7 @@ type Result struct {
 	Locale                string             `json:"locale"`                 
 	Mask                  string             `json:"mask"`                   
 	Messages              int64              `json:"messages"`               
-	Money                 Money              `json:"money"`                  
+	Money                 money              `json:"money"`                  
 	Name                  string             `json:"name"`                   
 	Nationality           string             `json:"nationality"`            
 	NeedPhoneConfirmation bool               `json:"need_phone_confirmation"`
@@ -90,12 +90,12 @@ type Result struct {
 	WelcomeSplash         int64              `json:"welcome_splash"`         
 }
 
-type Money struct {
-	Deposit  Deposit `json:"deposit"` 
-	Withdraw Deposit `json:"withdraw"`
+type money struct {
+	Deposit  deposit `json:"deposit"` 
+	Withdraw deposit `json:"withdraw"`
 }
 
-type Deposit struct {
+type deposit struct {
 	Max int64 `json:"max"`
 	Min int64 `json:"min"`
 }
