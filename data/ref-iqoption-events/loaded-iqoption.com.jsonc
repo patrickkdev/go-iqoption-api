@@ -1,0 +1,543 @@
+[
+// Client 👨‍💻->->->->🌎
+{
+  "name": "authenticate",
+  "msg": {
+    "ssid": "d52e7544f1ac15543d1550b0de3838f2",
+    "protocol": 3,
+    "client_session_id": ""
+  }
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "name": "authenticated",
+  "msg": true,
+  "client_session_id": "1da060db-ea76-4bc1-9ce5-4d2832d1dc91",
+  "request_id": ""
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "name": "front",
+  "msg": "ws18a.ws.prod.wz-ams2.quadcode.cloud",
+  "session_id": "15271541375489217103"
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "msg": {
+    "name": "get-personal-data-policy",
+    "version": "1.0",
+    "body": {}
+  },
+  "request_id": "41965045155263425"
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "subscribeMessage",
+  "msg": {
+    "version": "1.0",
+    "name": "timeSync"
+  },
+  "request_id": "26297811539905047"
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "41965045155263425",
+  "name": "personal-data-policy",
+  "msg": {
+    "is_email_accepted": {
+      "status": true
+    },
+    "is_call_accepted": {
+      "status": true
+    },
+    "is_push_accepted": {
+      "status": true
+    },
+    "is_agreement_accepted": {
+      "status": true
+    },
+    "is_thirdparty_accepted": {
+      "status": true
+    }
+  },
+  "status": 2000
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "msg": {
+    "name": "get-customer-steps",
+    "version": "2.0",
+    "body": {
+      "flow_id": "WEB3"
+    }
+  },
+  "request_id": "9236416615885181"
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "9236416615885181",
+  "name": "customer-steps",
+  "msg": {
+    "steps": [
+      {
+        "step_id": "EMAIL",
+        "state": "PASSED",
+        "is_skip_allowed": true,
+        "title": "Confirma\u00e7\u00e3o de e-mail",
+        "reason": null
+      },
+      {
+        "step_id": "PHONE",
+        "state": "PASSED",
+        "is_skip_allowed": true,
+        "title": "Confirma\u00e7\u00e3o de telefone",
+        "reason": null
+      },
+      {
+        "step_id": "PROFILE",
+        "state": "PASSED",
+        "is_skip_allowed": false,
+        "title": "Dados pessoais",
+        "reason": null
+      },
+      {
+        "step_id": "KYC_DOCUMENTS_POI",
+        "state": "PASSED",
+        "is_skip_allowed": true,
+        "title": "Prova de Identidade",
+        "reason": null
+      }
+    ],
+    "user_id": 38928481
+  },
+  "status": 2000
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "msg": {
+    "name": "get-popups",
+    "version": "1.0",
+    "body": {
+      "min_version": 1
+    }
+  },
+  "request_id": "24989457822219396"
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "msg": {
+    "name": "get-balances",
+    "version": "1.0",
+    "body": {}
+  },
+  "request_id": "6594850786776574"
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "msg": {
+    "name": "get-forget-user-status",
+    "version": "1.0",
+    "body": {}
+  },
+  "request_id": "3405696055605447"
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "msg": {
+    "name": "get-account",
+    "version": "1.0",
+    "body": {}
+  },
+  "request_id": "46877374972883823"
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "setLang",
+  "msg": {
+    "lang": "pt_PT"
+  },
+  "request_id": "9385570602545448"
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "msg": {
+    "name": "get-verification-init-data",
+    "version": "2.0"
+  },
+  "request_id": "4820075842939948"
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "msg": {
+    "name": "get-verify-card-status",
+    "version": "1.0",
+    "body": {}
+  },
+  "request_id": "7875028188156903"
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "msg": {
+    "name": "get-forget-user-status",
+    "version": "1.0",
+    "body": {}
+  },
+  "request_id": "2742923244429629"
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "6594850786776574",
+  "name": "balances",
+  "msg": [
+    {
+      "id": 112647979,
+      "user_id": 38928481,
+      "type": 1,
+      "amount": 0,
+      "enrolled_amount": 0,
+      "enrolled_sum_amount": 0,
+      "bonus_amount": 0,
+      "hold_amount": 0,
+      "orders_amount": 0,
+      "currency": "BRL",
+      "tournament_id": null,
+      "tournament_name": null,
+      "is_fiat": true,
+      "is_marginal": false,
+      "has_deposits": true,
+      "auth_amount": 0,
+      "equivalent": 0
+    },
+    {
+      "id": 112647980,
+      "user_id": 38928481,
+      "type": 4,
+      "amount": 10779.44,
+      "enrolled_amount": 10779.44,
+      "enrolled_sum_amount": 10779.44,
+      "bonus_amount": 0,
+      "hold_amount": 0,
+      "orders_amount": 0,
+      "currency": "USD",
+      "tournament_id": null,
+      "tournament_name": null,
+      "is_fiat": true,
+      "is_marginal": false,
+      "has_deposits": false,
+      "auth_amount": 0,
+      "equivalent": 0
+    },
+    {
+      "id": 112647981,
+      "user_id": 38928481,
+      "type": 5,
+      "amount": 0,
+      "enrolled_amount": 0,
+      "enrolled_sum_amount": 0,
+      "bonus_amount": 0,
+      "hold_amount": 0,
+      "orders_amount": 0,
+      "currency": "BTC",
+      "tournament_id": null,
+      "tournament_name": null,
+      "is_fiat": false,
+      "is_marginal": false,
+      "has_deposits": false,
+      "auth_amount": 0,
+      "equivalent": 0
+    },
+    {
+      "id": 112647982,
+      "user_id": 38928481,
+      "type": 5,
+      "amount": 0,
+      "enrolled_amount": 0,
+      "enrolled_sum_amount": 0,
+      "bonus_amount": 0,
+      "hold_amount": 0,
+      "orders_amount": 0,
+      "currency": "ETH",
+      "tournament_id": null,
+      "tournament_name": null,
+      "is_fiat": false,
+      "is_marginal": false,
+      "has_deposits": false,
+      "auth_amount": 0,
+      "equivalent": 0
+    }
+  ],
+  "status": 0
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "name": "timeSync",
+  "msg": 1710339151044
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "name": "heartbeat",
+  "msg": 1710339151044
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "3405696055605447",
+  "name": "forget-user-status",
+  "msg": {
+    "status": "none",
+    "created": null,
+    "expires": null
+  },
+  "status": 0
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "46877374972883823",
+  "name": "account",
+  "msg": {
+    "user_id": 38928481,
+    "status": "disabled",
+    "hidden": [],
+    "commission": 970
+  },
+  "status": 2000
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "7875028188156903",
+  "name": "verify-card-status",
+  "msg": [],
+  "status": 2000
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "24989457822219396",
+  "name": "popups",
+  "msg": {
+    "user_id": 38928481,
+    "popups": [
+      {
+        "id": 177,
+        "fields": {
+          "title": "web.homepage.marketanalysis.title",
+          "description": "web.homepage.marketanalysis.desc",
+          "image_url": "https://static.cdnpub.info/files/storage/public/5c/95/0014191b58a2g5i6h5/Market Analysis 2x.png",
+          "image2x_url": "https://static.cdnpub.info/files/storage/public/5c/95/0014191b58a2g5i6h5/Market Analysis 2x.png",
+          "bg_color": "#fff"
+        },
+        "name": "MarketAnalysis_InfoPage",
+        "format_id": 13,
+        "format_name": "Web. Home Page. Features",
+        "locale": "pt_PT",
+        "format_version": 1
+      },
+      {
+        "id": 171,
+        "fields": {
+          "title": "web.features.popup-name.title",
+          "description": "web.features.popup-name.description",
+          "image_url": "https://static.cdnpub.info/files/storage/public/5c/87/968d8c7ca1c4h3d4c1/WilliamsPercentRange.png",
+          "image2x_url": "https://static.cdnpub.info/files/storage/public/5c/87/968dd36400a7c5f5a4/WilliamsPercentRange@2x.png",
+          "bg_color": "#fff",
+          "bg_size": "cover"
+        },
+        "name": "Technical Analysis_InfoPage",
+        "format_id": 13,
+        "format_name": "Web. Home Page. Features",
+        "locale": "pt_PT",
+        "format_version": 1
+      },
+      {
+        "id": 149,
+        "fields": {
+          "button_title": "web.homepage.announce.button.title",
+          "title": "web.homepage.announce.title",
+          "description": "web.homepage.announce.desc",
+          "button_trade_now": "1",
+          "bg_color": "#fff",
+          "image2x_url": "https://static.cdnpub.info/files/storage/public/5c/95/00982ec7c0a0j5f9h6/Features Dashboard 2 2x.png",
+          "rank": "23",
+          "image_url": "",
+          "button_url": "https://eu.iqoption.com/traderoom/asset/1?type=binary"
+        },
+        "name": "Homepage about homepage",
+        "format_id": 13,
+        "format_name": "Web. Home Page. Features",
+        "locale": "pt_PT",
+        "format_version": 1
+      }
+    ]
+  },
+  "status": 2000
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "4820075842939948",
+  "name": "verification-init-data",
+  "msg": {
+    "user_id": 38928481,
+    "requirements_data": {
+      "user_id": 38928481,
+      "requirements": null
+    },
+    "restrictions_data": {
+      "user_id": 38928481,
+      "restrictions": null
+    },
+    "verification_level_data": {
+      "user_id": 38928481,
+      "level": "ENHANCED",
+      "level_indicator": "OK",
+      "required_steps": null,
+      "need_action_steps": null,
+      "show_level_indicator": true
+    },
+    "steps_summary": {
+      "steps_count": 0
+    }
+  },
+  "status": 2000
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "msg": {
+    "name": "request-chat-room",
+    "version": "1.0"
+  },
+  "request_id": "4477727229362620"
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "4477727229362620",
+  "name": "chat-room",
+  "msg": {
+    "isSuccessful": true,
+    "data": [
+      {
+        "id": "support",
+        "type": "support",
+        "locale": null,
+        "subject": "",
+        "name": "front.platform.support",
+        "name_loc": "Suporte",
+        "icon": "https://fsms.iqoption.com/storage/public/5f/7a/fa83cf9ba7f8e8f0b7.png",
+        "icon_2x": "https://fsms.iqoption.com/storage/public/5f/7a/fa83cf9ba7f8e8f0b7.png",
+        "icon_path": "/storage/public/5f/7a/fa83cf9ba7f8e8f0b7.png",
+        "icon_2x_path": "/storage/public/5f/7a/fa83cf9ba7f8e8f0b7.png",
+        "use_real_name": true,
+        "is_public": false,
+        "is_write": true,
+        "is_regulated": null,
+        "is_unread_messages": false,
+        "last_read_message_id": "252208970",
+        "online_users": 0
+      },
+      {
+        "id": "437703",
+        "type": "global",
+        "locale": "en_US",
+        "subject": "cfd-instrument",
+        "name": "front.platform.chats.stockschat",
+        "name_loc": "Chat de Mercado de A\u00e7\u00f5es",
+        "icon": "https://static.cdnpub.info/files/storage/public/5a/86/efa80e458.png",
+        "icon_2x": "https://static.cdnpub.info/files/storage/public/5a/86/f0ded24a2.png",
+        "icon_path": "/storage/public/5a/86/efa80e458.png",
+        "icon_2x_path": "/storage/public/5a/86/f0ded24a2.png",
+        "use_real_name": false,
+        "is_public": true,
+        "is_write": true,
+        "is_regulated": false,
+        "is_unread_messages": true,
+        "last_read_message_id": "91118519",
+        "online_users": 2
+      },
+      {
+        "id": "164947",
+        "type": "global",
+        "locale": "en_US",
+        "subject": "crypto-instrument",
+        "name": "front.platform.chats.crypto",
+        "name_loc": "Chat Cripto (English)",
+        "icon": "https://static.cdnpub.info/files/storage/public/59/80/9de6d7368.png",
+        "icon_2x": "https://static.cdnpub.info/files/storage/public/5a/87/18b08b5f0.png",
+        "icon_path": "/storage/public/59/80/9de6d7368.png",
+        "icon_2x_path": "/storage/public/5a/87/18b08b5f0.png",
+        "use_real_name": false,
+        "is_public": true,
+        "is_write": true,
+        "is_regulated": false,
+        "is_unread_messages": true,
+        "last_read_message_id": "76731855",
+        "online_users": 2
+      },
+      {
+        "id": "164946",
+        "type": "global",
+        "locale": "en_US",
+        "subject": "forex-instrument",
+        "name": "front.platform.chats.forex",
+        "name_loc": "Chat Forex",
+        "icon": "https://static.cdnpub.info/files/storage/public/59/80/9dc746bf3.png",
+        "icon_2x": "https://static.cdnpub.info/files/storage/public/5a/86/f21046b85.png",
+        "icon_path": "/storage/public/59/80/9dc746bf3.png",
+        "icon_2x_path": "/storage/public/5a/86/f21046b85.png",
+        "use_real_name": false,
+        "is_public": true,
+        "is_write": true,
+        "is_regulated": false,
+        "is_unread_messages": true,
+        "last_read_message_id": "81151595",
+        "online_users": 0
+      },
+      {
+        "id": "82288",
+        "type": "global",
+        "locale": "pt_PT",
+        "subject": "",
+        "name": "front.platform.chats.global_pt_PT",
+        "name_loc": "Chat em Portugu\u00eas",
+        "icon": "https://static.cdnpub.info/files/storage/public/59/81/adf898b82.png",
+        "icon_2x": "https://fsms.iqoption.com/storage/public/5f/7a/fa83cf9ba7f8e8f0b7.png",
+        "icon_path": "/storage/public/59/81/adf898b82.png",
+        "icon_2x_path": "/storage/public/5f/7a/fa83cf9ba7f8e8f0b7.png",
+        "use_real_name": false,
+        "is_public": true,
+        "is_write": true,
+        "is_regulated": false,
+        "is_unread_messages": true,
+        "last_read_message_id": "56290673",
+        "online_users": 5
+      },
+      {
+        "id": "56028",
+        "type": "global",
+        "locale": "en_US",
+        "subject": "",
+        "name": "front.platform.chats.global_en_US",
+        "name_loc": "Chat em Ingl\u00eas",
+        "icon": "https://static.cdnpub.info/files/storage/public/59/81/acf7d3d17.png",
+        "icon_2x": "https://fsms.iqoption.com/storage/public/5f/7a/fa83cf9ba7f8e8f0b7.png",
+        "icon_path": "/storage/public/59/81/acf7d3d17.png",
+        "icon_2x_path": "/storage/public/5f/7a/fa83cf9ba7f8e8f0b7.png",
+        "use_real_name": false,
+        "is_public": true,
+        "is_write": true,
+        "is_regulated": false,
+        "is_unread_messages": true,
+        "last_read_message_id": "189713285",
+        "online_users": 19
+      }
+    ]
+  },
+  "status": 2000
+},
+]

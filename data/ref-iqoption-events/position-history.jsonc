@@ -1,0 +1,625 @@
+[
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1235",
+  "local_time": 935080,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "turbo-option",
+        "binary-option"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1236",
+  "local_time": 935080,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "cfd"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1237",
+  "local_time": 935080,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "digital-option"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1238",
+  "local_time": 935080,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "forex"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1239",
+  "local_time": 935080,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "marginal-cfd"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1240",
+  "local_time": 935080,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "exchange-option"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1241",
+  "local_time": 935080,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "crypto"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1242",
+  "local_time": 935080,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "fx-option"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1243",
+  "local_time": 935080,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "marginal-forex"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1244",
+  "local_time": 935081,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "marginal-crypto"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1245",
+  "local_time": 935081,
+  "msg": {
+    "name": "portfolio.get-history-positions",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481,
+      "user_balance_id": 112647980,
+      "instrument_types": [
+        "blitz-option"
+      ],
+      "offset": 0,
+      "limit": 30
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1246",
+  "local_time": 935099,
+  "msg": {
+    "name": "get-feed-languages",
+    "version": "2.0",
+    "body": {
+      "user_id": 38928481
+    }
+  }
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "1246",
+  "name": "feed-languages",
+  "msg": {
+    "type": "language_settings",
+    "available_settings": [
+      {
+        "id": 10,
+        "name": "Bahasa Indonesia",
+        "locale": "id",
+        "auto_translate": true,
+        "hot_sources": 212,
+        "hot_news": 748761,
+        "is_selected": false,
+        "updated_at": 1554286837336,
+        "icon_url": "/storage/public/5c/a4/a850586938h0c6e4j5/id_ID.png"
+      },
+      {
+        "id": 1,
+        "name": "English",
+        "locale": "en",
+        "auto_translate": false,
+        "hot_sources": 642,
+        "hot_news": 912590,
+        "is_selected": false,
+        "updated_at": 1545654671335,
+        "icon_url": "/storage/public/5c/a4/a850894e54h6d1i4c2/en_US.png"
+      },
+      {
+        "id": 7,
+        "name": "\u0420\u0443\u0441\u0441\u043a\u0438\u0439",
+        "locale": "ru",
+        "auto_translate": true,
+        "hot_sources": 211,
+        "hot_news": 747249,
+        "is_selected": false,
+        "updated_at": 1554286837336,
+        "icon_url": "/storage/public/5c/a4/a850ac31d9g7e4a4i7/ru_RU.png"
+      },
+      {
+        "id": 3,
+        "name": "Portugu\u00eas",
+        "locale": "pt",
+        "auto_translate": true,
+        "hot_sources": 213,
+        "hot_news": 747480,
+        "is_selected": false,
+        "updated_at": 1554286837334,
+        "icon_url": "/storage/public/5c/a4/a850aacf16i0d1j4i8/pt_PT.png"
+      },
+      {
+        "id": 6,
+        "name": "Italiano",
+        "locale": "it",
+        "auto_translate": true,
+        "hot_sources": 212,
+        "hot_news": 746624,
+        "is_selected": false,
+        "updated_at": 1554286837336,
+        "icon_url": "/storage/public/5c/a4/a8505803e6j0j3c8d6/it_IT.png"
+      },
+      {
+        "id": 9,
+        "name": "Fran\u00e7ais",
+        "locale": "fr",
+        "auto_translate": true,
+        "hot_sources": 213,
+        "hot_news": 745889,
+        "is_selected": false,
+        "updated_at": 1554286837336,
+        "icon_url": "/storage/public/5c/a4/a850b15a49g3d9d0j7/ft_FR.png"
+      },
+      {
+        "id": 2,
+        "name": "Deutsch",
+        "locale": "de",
+        "auto_translate": true,
+        "hot_sources": 211,
+        "hot_news": 746979,
+        "is_selected": false,
+        "updated_at": 1554286837333,
+        "icon_url": "/storage/public/5c/a4/a8504bf323d4g2d3j4/de_DE.png"
+      },
+      {
+        "id": 8,
+        "name": "Espa\u00f1ol",
+        "locale": "es",
+        "auto_translate": false,
+        "hot_sources": 57,
+        "hot_news": 50518,
+        "is_selected": false,
+        "updated_at": 1554286837336,
+        "icon_url": "/storage/public/5c/a4/a8507b7f20f8j3h4h0/es_ES.png"
+      },
+      {
+        "id": 4,
+        "name": "Espa\u00f1ol",
+        "locale": "es",
+        "auto_translate": true,
+        "hot_sources": 212,
+        "hot_news": 747773,
+        "is_selected": false,
+        "updated_at": 1554286837334,
+        "icon_url": "/storage/public/5c/a4/a8507b7f20f8j3h4h0/es_ES.png"
+      },
+      {
+        "id": 5,
+        "name": "\u0e44\u0e17\u0e22",
+        "locale": "th",
+        "auto_translate": true,
+        "hot_sources": 212,
+        "hot_news": 746430,
+        "is_selected": false,
+        "updated_at": 1554286837336,
+        "icon_url": "/storage/public/5c/a4/a85086f258a8d3h4b5/th_TH.png"
+      }
+    ]
+  },
+  "status": 2000
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1247",
+  "local_time": 935448,
+  "msg": {
+    "name": "get-active",
+    "version": "5.0",
+    "body": {
+      "id": 2
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1248",
+  "local_time": 935448,
+  "msg": {
+    "name": "get-active",
+    "version": "5.0",
+    "body": {
+      "id": 7
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1249",
+  "local_time": 935448,
+  "msg": {
+    "name": "get-active",
+    "version": "5.0",
+    "body": {
+      "id": 107
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1250",
+  "local_time": 935448,
+  "msg": {
+    "name": "get-active",
+    "version": "5.0",
+    "body": {
+      "id": 983
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1251",
+  "local_time": 935448,
+  "msg": {
+    "name": "get-active",
+    "version": "5.0",
+    "body": {
+      "id": 104
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1252",
+  "local_time": 935448,
+  "msg": {
+    "name": "get-active",
+    "version": "5.0",
+    "body": {
+      "id": 99
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1254",
+  "local_time": 935779,
+  "msg": {
+    "name": "get-active",
+    "version": "5.0",
+    "body": {
+      "id": 78
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1255",
+  "local_time": 935779,
+  "msg": {
+    "name": "get-active",
+    "version": "5.0",
+    "body": {
+      "id": 80
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1258",
+  "local_time": 938282,
+  "msg": {
+    "name": "get-active",
+    "version": "5.0",
+    "body": {
+      "id": 76
+    }
+  }
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1261",
+  "local_time": 940276,
+  "msg": {
+    "name": "set-user-settings",
+    "version": "1.0",
+    "body": {
+      "name": "traderoom_gl_grid",
+      "version": 2,
+      "client_id": "1710339279208000",
+      "config": {
+        "name": "default",
+        "gridSchemeName": "default_1_1",
+        "gridSchemeRows": [
+          100.0
+        ],
+        "gridSchemeColumns": [
+          100.0
+        ],
+        "fixedNumberOfPlotters": 1,
+        "plotters": [
+          {
+            "activeId": 1,
+            "activeType": "binary",
+            "isMinimized": true,
+            "plotType": "candles",
+            "emptyCandles": false,
+            "candleDuration": 900,
+            "timeScale": 16875.0,
+            "indicators": "{\"indicators\":[]}",
+            "scriptedIndicators": "{\"scripted_indicators\":[]}",
+            "stackPanelSizes": [
+              100.0
+            ],
+            "lineColor": "",
+            "lineWidth": 1.0,
+            "candleColorUp": "",
+            "candleColorDown": "",
+            "emptyHACandles": false,
+            "candleHAColorUp": "",
+            "candleHAColorDown": "",
+            "chartPriceType": "mid"
+          },
+          {
+            "activeId": 80,
+            "activeType": "turbo",
+            "isMinimized": true,
+            "plotType": "candles",
+            "emptyCandles": false,
+            "candleDuration": 900,
+            "timeScale": 16875.0,
+            "indicators": "{\"indicators\":[]}",
+            "scriptedIndicators": "{\"scripted_indicators\":[]}",
+            "stackPanelSizes": [
+              100.0
+            ],
+            "lineColor": "",
+            "lineWidth": 1.0,
+            "candleColorUp": "",
+            "candleColorDown": "",
+            "emptyHACandles": false,
+            "candleHAColorUp": "",
+            "candleHAColorDown": "",
+            "chartPriceType": "mid"
+          },
+          {
+            "activeId": 76,
+            "activeType": "digital-option",
+            "isMinimized": true,
+            "plotType": "candles",
+            "emptyCandles": false,
+            "candleDuration": 900,
+            "timeScale": 16875.0,
+            "indicators": "{\"indicators\":[]}",
+            "scriptedIndicators": "{\"scripted_indicators\":[]}",
+            "stackPanelSizes": [
+              100.0
+            ],
+            "lineColor": "",
+            "lineWidth": 1.0,
+            "candleColorUp": "",
+            "candleColorDown": "",
+            "emptyHACandles": false,
+            "candleHAColorUp": "",
+            "candleHAColorDown": "",
+            "chartPriceType": "mid"
+          },
+          {
+            "activeId": 1,
+            "activeType": "turbo",
+            "isMinimized": true,
+            "plotType": "candles",
+            "emptyCandles": false,
+            "candleDuration": 900,
+            "timeScale": 16875.0,
+            "indicators": "{\"indicators\":[]}",
+            "scriptedIndicators": "{\"scripted_indicators\":[]}",
+            "stackPanelSizes": [
+              100.0
+            ],
+            "lineColor": "",
+            "lineWidth": 1.0,
+            "candleColorUp": "",
+            "candleColorDown": "",
+            "emptyHACandles": false,
+            "candleHAColorUp": "",
+            "candleHAColorDown": "",
+            "chartPriceType": "mid"
+          },
+          {
+            "activeId": 100,
+            "activeType": "digital-option",
+            "isMinimized": false,
+            "plotType": "candles",
+            "emptyCandles": false,
+            "candleDuration": 900,
+            "timeScale": 19316.25,
+            "indicators": "{\"indicators\":[]}",
+            "scriptedIndicators": "{\"scripted_indicators\":[]}",
+            "stackPanelSizes": [
+              100.0
+            ],
+            "lineColor": "",
+            "lineWidth": 1.0,
+            "candleColorUp": "",
+            "candleColorDown": "",
+            "emptyHACandles": false,
+            "candleHAColorUp": "",
+            "candleHAColorDown": "",
+            "chartPriceType": "mid"
+          },
+          {
+            "activeId": 1,
+            "activeType": "turbo",
+            "isMinimized": true,
+            "plotType": "candles",
+            "emptyCandles": false,
+            "candleDuration": 900,
+            "timeScale": 19316.25,
+            "indicators": "{\"indicators\":[]}",
+            "scriptedIndicators": "{\"scripted_indicators\":[]}",
+            "stackPanelSizes": [
+              100.0
+            ],
+            "lineColor": "",
+            "lineWidth": 1.0,
+            "candleColorUp": "",
+            "candleColorDown": "",
+            "emptyHACandles": false,
+            "candleHAColorUp": "",
+            "candleHAColorDown": "",
+            "chartPriceType": "mid"
+          }
+        ],
+        "selectedActiveId": 100,
+        "selectedActiveType": "digital-option"
+      }
+    }
+  }
+}
+]

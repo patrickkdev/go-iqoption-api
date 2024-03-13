@@ -1,0 +1,23 @@
+[
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
+  "request_id": "1744",
+  "local_time": 1379780,
+  "msg": {
+    "name": "internal-billing.reset-training-balance",
+    "version": "3.0",
+    "body": {
+      "user_balance_id": 112647980,
+      "amount": 10000
+    }
+  }
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "1744",
+  "name": "training-balance-reset",
+  "msg": {},
+  "status": 2000
+}
+]
