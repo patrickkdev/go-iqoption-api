@@ -107,11 +107,10 @@ func GetCoreProfile(ws *Socket, serverTimeStamp int64, timeout time.Time) (*Core
 		"version": "1.0",
 	}
 
-	requestEvent := &Event{
+	requestEvent := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       eventMsg,
 		RequestId: "2",
-		LocalTime: serverTimeStamp,
 	}
 
 	resp, err := EmitWithResponse(ws, requestEvent, "profile", time.Now().Add(1*time.Minute))
@@ -161,7 +160,7 @@ func GetUserProfileClient(ws *Socket, userId int, serverTimeStamp int64, timeout
 		"version": "1.0",
 	}
 
-	event := &Event{
+	event := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       eventMsg,
 		RequestId: "157",

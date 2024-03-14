@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"patrickkdev/Go-IQOption-API/api"
+	"patrickkdev/Go-IQOption-API/data"
 	"patrickkdev/Go-IQOption-API/debug"
 	"patrickkdev/Go-IQOption-API/wsapi"
 	"time"
@@ -18,7 +19,7 @@ func main() {
 	userConnection := connectBroker(email, password)
 	profile := getProfile(userConnection)
 
-	fmt.Printf("Olá, %s\n", profile.Name)
+	fmt.Printf("Olá, %s\n", profile.Msg.UserName)
 
 	startTradingBinaries(userConnection)
 
@@ -27,21 +28,44 @@ func main() {
 
 func startTradingBinaries(userConnection *api.BrokerClient) {
 	for {
-		tradeDirection := map[bool]wsapi.TradeDirection{
-			true:  wsapi.TradeDirectionCall,
-			false: wsapi.TradeDirectionPut,
-		}[rand.Intn(2) == 0]
+		tradeType := map[bool]wsapi.TradeType{
+			true:  wsapi.TradeTypeDigital,
+			false: wsapi.TradeTypeBinary,
+		}[rand.Float32() < 0.5]
 
-		duration := 1
+		duration := 1// rand.Intn(4) + 1
+		
+		pair, err := data.Pairs.GetByName("EURUSD-OTC")
+		if err != nil {
+			panic(err)
+		}
 
-		userConnection.OpenTrade(
-			wsapi.TradeTypeBinary,
-			100,
+		candles, err := wsapi.GetCandles(userConnection.WebSocket, duration, 60 * 1, int(time.Now().Unix()), pair)
+		if err != nil {
+			panic(err)
+		}
+
+		// Color strategy, trade call if last candle was green
+		// and put if last candle was red
+		tradeDirection := wsapi.TradeDirectionCall
+		if candles.GetLast().Close < candles.GetLast().Open {
+			tradeDirection = wsapi.TradeDirectionPut
+		}
+
+		tradeID, err := userConnection.OpenTrade(
+			tradeType,
+			2,
 			tradeDirection,
-			1,
+			pair,
 			duration,
 			wsapi.TradeBalanceDemo,
 		)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		
+		fmt.Printf("Successully opened trade of type '%s' with ID '%d'\n", tradeType, tradeID)
 
 		time.Sleep(time.Minute * time.Duration(duration))
 	}

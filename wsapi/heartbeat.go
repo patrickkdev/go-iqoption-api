@@ -20,7 +20,7 @@ func AnswerHeartbeat(ws *Socket, heartbeatFromServer Heartbeat, serverTimestamp 
 
 		debug.If(bool(debug.IfVerbose) && false).Println("Received heartbeat from server at:", int(heartbeatTime))
 	
-		heartbeatFromClient := &Event{
+		heartbeatFromClient := &RequestEvent{
 			RequestId: requestId,
 			Name:      "heartbeat",
 			Msg:       map[string]interface{}{

@@ -33,13 +33,17 @@ func NewSocketConnection(url string) (*Socket, error) {
 	conn, _, err := websocket.Dial(ctx, url, &websocket.DialOptions{
 		HTTPHeader: header,
 	})
+
 	if err != nil {
 		return nil, err
 	}
 
 	if conn == nil {
 		debug.IfVerbose.Println("conn is nil")
+		return nil, fmt.Errorf("conn is nil")
 	}
+
+	conn.SetReadLimit(-1)
 
 	newSocketConnection := &Socket{
 		eventHandlers: make(map[string]EventCallback),
@@ -112,7 +116,7 @@ func (ws *Socket) Listen() {
 		}
 
 		if errorCount > 5 {
-			println("too many errors")
+			debug.IfVerbose.Println("too many errors")
 			ws.Conn.Close(websocket.StatusAbnormalClosure, "close")
 			ws.Closed = true
 			continue
@@ -121,7 +125,7 @@ func (ws *Socket) Listen() {
 		_, message, err := ws.Conn.Read(ws.ctx)
 
 		if err != nil {
-			fmt.Println("error reading ws event:", err)
+			debug.IfVerbose.Println("error reading ws event:", err)
 			errorCount++
 			continue
 		}
