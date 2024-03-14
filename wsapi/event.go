@@ -11,7 +11,7 @@ type Event struct {
 	Msg       interface{} `json:"msg"`
 	Version   string      `json:"version"`
 	RequestId string      `json:"request_id"`
-	LocalTime int         `json:"local_time"`
+	LocalTime int64       `json:"local_time"`
 }
 
 func NewEvent(name string, msg map[string]interface{}, requestId string) *Event {

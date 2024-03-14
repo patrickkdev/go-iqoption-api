@@ -49,7 +49,7 @@ func GetExpirationTime(timestamp int64, duration int) (int, int) {
 	return int(exp[getIndex(close, minClose)]), int(getIndex(close, minClose))
 }
 
-func abs (x int) int {
+func abs(x int) int {
 	if x < 0 {
 		return -x
 	}

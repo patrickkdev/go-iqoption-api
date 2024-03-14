@@ -56,7 +56,7 @@ func (bC *BrokerClient) ConnectSocket() error {
 	}
 
 	bC.WebSocket = socketConnection
-	
+
 	// Handle heartbeat
 	bC.WebSocket.AddEventListener("heartbeat", func(event []byte) {
 		var heartbeatFromServer wsapi.Heartbeat
@@ -76,9 +76,9 @@ func (bC *BrokerClient) ConnectSocket() error {
 	// Handle authentication
 	resp, err := wsapi.Authenticate(
 		bC.WebSocket,
-		bC.Session.SSID, 
+		bC.Session.SSID,
 		int(bC.TimeSync.GetServerTimestamp()*1000),
-		time.Now().Add(5 * time.Second),
+		time.Now().Add(5*time.Second),
 	)
 
 	debug.PrintAsJSON(resp)
@@ -95,9 +95,9 @@ func (bC *BrokerClient) ConnectSocket() error {
 
 func (bC *BrokerClient) GetCoreProfile() (*wsapi.CoreProfile, error) {
 	return wsapi.GetCoreProfile(
-		bC.WebSocket, 
-		bC.TimeSync.GetServerTimestamp(), 
-		time.Now().Add(5 * time.Second),
+		bC.WebSocket,
+		bC.TimeSync.GetServerTimestamp(),
+		time.Now().Add(5*time.Second),
 	)
 }
 
@@ -106,6 +106,43 @@ func (bC *BrokerClient) GetProfileClient(userId int) (*wsapi.UserProfileClient, 
 		bC.WebSocket,
 		userId,
 		bC.TimeSync.GetServerTimestamp(),
-		time.Now().Add(5 * time.Second),
+		time.Now().Add(5*time.Second),
 	)
+}
+
+func (bC *BrokerClient) OpenTrade(type_ wsapi.TradeType, amount float64, direction wsapi.TradeDirection, activeID int, duration int, balance wsapi.TradeBalance) (int, error) {
+	balances, err := wsapi.GetBalances(bC.WebSocket, bC.TimeSync.GetServerTimestamp())
+	if err != nil {
+		return 0, err
+	}
+
+	targetBalance, err := balances.FindByType(balance)
+	if err != nil {
+		return 0, err
+	}
+
+	switch type_ {
+	case wsapi.TradeTypeBinary:
+		wsapi.TradeBinary(
+			bC.WebSocket,
+			amount,
+			direction,
+			activeID,
+			duration,
+			targetBalance.ID,
+			bC.TimeSync.GetServerTimestamp(),
+		)
+	case wsapi.TradeTypeDigital:
+		wsapi.TradeDigital(
+			bC.WebSocket,
+			amount,
+			direction,
+			activeID,
+			duration,
+			targetBalance.ID,
+			bC.TimeSync.GetServerTimestamp(),
+		)
+	}
+
+	return 0, nil
 }

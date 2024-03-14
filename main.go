@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"patrickkdev/Go-IQOption-API/api"
 	"patrickkdev/Go-IQOption-API/debug"
 	"patrickkdev/Go-IQOption-API/wsapi"
+	"time"
 )
 
 func main() {
@@ -18,24 +20,31 @@ func main() {
 
 	fmt.Printf("Olá, %s\n", profile.Name)
 
-	fmt.Println("Profile: ")
-	debug.PrintAsJSON(profile)
-
-	balances, err := wsapi.GetBalances(userConnection.WebSocket, int(userConnection.TimeSync.GetServerTimestamp()))
-	if err != nil {
-		panic(err)
-	}
-
-	demoAccBalance, err := balances.FindByType(4)
-	if err != nil {
-		panic(err)
-	}
-
-	debug.PrintAsJSON(demoAccBalance)
-
-	wsapi.TradeBinary(userConnection.WebSocket, 50, 1, int(demoAccBalance.ID), int(userConnection.TimeSync.GetServerTimestamp()))
+	startTradingBinaries(userConnection)
 
 	userConnection.WebSocket.WaitGroup.Wait()
+}
+
+func startTradingBinaries(userConnection *api.BrokerClient) {
+	for {
+		tradeDirection := map[bool]wsapi.TradeDirection{
+			true:  wsapi.TradeDirectionCall,
+			false: wsapi.TradeDirectionPut,
+		}[rand.Intn(2) == 0]
+
+		duration := 1
+
+		userConnection.OpenTrade(
+			wsapi.TradeTypeBinary,
+			100,
+			tradeDirection,
+			1,
+			duration,
+			wsapi.TradeBalanceDemo,
+		)
+
+		time.Sleep(time.Minute * time.Duration(duration))
+	}
 }
 
 func connectBroker(email string, password string) *api.BrokerClient {
