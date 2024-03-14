@@ -40,7 +40,7 @@ func startTradingBinaries(userConnection *api.BrokerClient) {
 			panic(err)
 		}
 
-		candles, err := wsapi.GetCandles(userConnection.WebSocket, duration, 60 * 1, int(time.Now().Unix()), pair)
+		candles, err := wsapi.GetCandles(userConnection.WebSocket, 2, 60 * 1, int(time.Now().UnixMicro()), pair)
 		if err != nil {
 			panic(err)
 		}
@@ -48,7 +48,7 @@ func startTradingBinaries(userConnection *api.BrokerClient) {
 		// Color strategy, trade call if last candle was green
 		// and put if last candle was red
 		tradeDirection := wsapi.TradeDirectionCall
-		if candles.GetLast().Close < candles.GetLast().Open {
+		if candles[0].Close < candles[0].Open {
 			tradeDirection = wsapi.TradeDirectionPut
 		}
 
