@@ -2,9 +2,10 @@ package wsapi
 
 import (
 	"fmt"
-	"patrickkdev/Go-IQOption-API/debug"
-	"patrickkdev/Go-IQOption-API/tjson"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/debug"
+	"github.com/patrickkdev/Go-IQOption-API/tjson"
 )
 
 type binaryCheckResultResponse struct {
@@ -262,9 +263,9 @@ func CheckResultDigital(ws *Socket, tradeID int, timeout time.Time) (*DigitalRes
 		}
 
 		debug.IfVerbose.Println("Position changed for digital trade:", res.Msg.Status, orderID, tradeID)
-		
+
 		if res.Msg.Status != "closed" {
-			continue			
+			continue
 		}
 
 		break
@@ -274,7 +275,7 @@ func CheckResultDigital(ws *Socket, tradeID int, timeout time.Time) (*DigitalRes
 
 	win := res.Msg.Pnl > 0
 	debug.IfVerbose.Println("Check result digital: ", res.Msg.Pnl, win)
-	
+
 	if err != nil {
 		return nil, false, err
 	}

@@ -1,4 +1,4 @@
-module patrickkdev/Go-IQOption-API
+module github.com/patrickkdev/Go-IQOption-API
 
 go 1.21.1
 

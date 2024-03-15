@@ -3,8 +3,9 @@ package wsapi
 import (
 	"fmt"
 	"math/rand"
-	"patrickkdev/Go-IQOption-API/debug"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/debug"
 )
 
 type RequestEvent struct {
@@ -54,6 +55,6 @@ func EmitWithResponse(ws *Socket, event *RequestEvent, responseEventName string,
 
 func Emit(ws *Socket, event *RequestEvent) {
 	event.RequestId = fmt.Sprint(rand.Int63n(10000000000))
-	
+
 	ws.EmitEvent(event)
 }

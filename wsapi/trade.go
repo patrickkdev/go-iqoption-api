@@ -2,9 +2,10 @@ package wsapi
 
 import (
 	"fmt"
-	"patrickkdev/Go-IQOption-API/debug"
-	"patrickkdev/Go-IQOption-API/tjson"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/debug"
+	"github.com/patrickkdev/Go-IQOption-API/tjson"
 )
 
 type TradeDirection string
@@ -12,51 +13,51 @@ type TradeBalance int
 type TradeType string
 
 const (
-	TradeDirectionCall 		TradeDirection = "call"
-	TradeDirectionPut  		TradeDirection = "put"
+	TradeDirectionCall TradeDirection = "call"
+	TradeDirectionPut  TradeDirection = "put"
 )
 
 const (
-	TradeBalanceDemo 			TradeBalance = 4
+	TradeBalanceDemo TradeBalance = 4
 )
 
 const (
-	TradeTypeDigital 	TradeType = 	"digital"
-	TradeTypeBinary  	TradeType = 	"binary"
+	TradeTypeDigital TradeType = "digital"
+	TradeTypeBinary  TradeType = "binary"
 )
 
 type tradeDigitalResponseEvent struct {
-	RequestID 						string 				`json:"request_id"`
-	Name      						string 				`json:"name"`      
-	Msg       						struct {		
-		ID 									int 					`json:"id"`
-	}    																`json:"msg"`       
-	Status    						int  					`json:"status"`    
+	RequestID string `json:"request_id"`
+	Name      string `json:"name"`
+	Msg       struct {
+		ID int `json:"id"`
+	} `json:"msg"`
+	Status int `json:"status"`
 }
 
 type tradeBinaryResponseEvent struct {
-	RequestID 						string 				`json:"request_id"`
-	Name      						string 				`json:"name"`      
-	Msg       						struct {
-		UserID             	int64       	`json:"user_id"`            
-		ID                 	int     			`json:"id"`                 
-		RefundValue        	int64       	`json:"refund_value"`       
-		Price              	int64       	`json:"price"`              
-		Exp                	int64       	`json:"exp"`                
-		Created            	int64       	`json:"created"`            
-		CreatedMillisecond 	int64       	`json:"created_millisecond"`
-		TimeRate           	int64       	`json:"time_rate"`          
-		Type               	string      	`json:"type"`               
-		Act                	int64       	`json:"act"`                
-		Direction          	string      	`json:"direction"`          
-		ExpValue           	int64       	`json:"exp_value"`          
-		Value              	float64     	`json:"value"`              
-		ProfitIncome       	int64       	`json:"profit_income"`      
-		ProfitReturn       	int64       	`json:"profit_return"`      
-		RobotID            	interface{} 	`json:"robot_id"`           
-		ClientPlatformID   	int64       	`json:"client_platform_id"` 
-	}    																`json:"msg"`       
-	Status    						int64  				`json:"status"`    
+	RequestID string `json:"request_id"`
+	Name      string `json:"name"`
+	Msg       struct {
+		UserID             int64       `json:"user_id"`
+		ID                 int         `json:"id"`
+		RefundValue        int64       `json:"refund_value"`
+		Price              int64       `json:"price"`
+		Exp                int64       `json:"exp"`
+		Created            int64       `json:"created"`
+		CreatedMillisecond int64       `json:"created_millisecond"`
+		TimeRate           int64       `json:"time_rate"`
+		Type               string      `json:"type"`
+		Act                int64       `json:"act"`
+		Direction          string      `json:"direction"`
+		ExpValue           int64       `json:"exp_value"`
+		Value              float64     `json:"value"`
+		ProfitIncome       int64       `json:"profit_income"`
+		ProfitReturn       int64       `json:"profit_return"`
+		RobotID            interface{} `json:"robot_id"`
+		ClientPlatformID   int64       `json:"client_platform_id"`
+	} `json:"msg"`
+	Status int64 `json:"status"`
 }
 
 func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64, timeout time.Time) (tradeID int, err error) {
@@ -85,8 +86,8 @@ func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID
 	}
 
 	requestEvent := &RequestEvent{
-		Name:      "sendMessage",
-		Msg:       eventMsg,
+		Name: "sendMessage",
+		Msg:  eventMsg,
 	}
 
 	debug.IfVerbose.Println("requestEvent:")
@@ -112,7 +113,6 @@ func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID
 	return responseEvent.Msg.ID, nil
 }
 
-
 func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64, timeout time.Time) (tradeID int, err error) {
 	exp, idx := GetExpirationTime(serverTimeStamp, duration)
 	debug.IfVerbose.Println("expiration time: ", idx)
@@ -136,8 +136,8 @@ func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID 
 	}
 
 	requestEvent := &RequestEvent{
-		Name:      "sendMessage",
-		Msg:       eventMsg,
+		Name: "sendMessage",
+		Msg:  eventMsg,
 	}
 
 	debug.IfVerbose.Println("requestEvent:")
@@ -159,6 +159,6 @@ func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID 
 	if responseEvent.Msg.ID == 0 {
 		return 0, fmt.Errorf("error placing trade")
 	}
-	
+
 	return responseEvent.Msg.ID, nil
 }

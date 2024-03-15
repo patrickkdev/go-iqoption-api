@@ -1,8 +1,9 @@
 package wsapi
 
 import (
-	"patrickkdev/Go-IQOption-API/tjson"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/tjson"
 )
 
 type AuthenticationResponse struct {

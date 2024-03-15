@@ -2,14 +2,15 @@ package wsapi
 
 import (
 	"fmt"
-	"patrickkdev/Go-IQOption-API/debug"
-	"patrickkdev/Go-IQOption-API/tjson"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/debug"
+	"github.com/patrickkdev/Go-IQOption-API/tjson"
 )
 
 type getCandlesResponse struct {
 	Msg struct {
-		Candles  []Candle `json:"candles"`
+		Candles []Candle `json:"candles"`
 	} `json:"msg"`
 	Name      string `json:"name"`
 	RequestID string `json:"request_id"`
@@ -36,20 +37,20 @@ func (candles Candles) GetLast() (candle Candle) {
 
 func GetCandles(ws *Socket, count int, timeFrameInMinutes int, endtime int64, activeID int, timeout time.Time) (candles Candles, err error) {
 	msg := map[string]interface{}{
-		"name": "get-candles",
+		"name":    "get-candles",
 		"version": "2.0",
 		"body": map[string]interface{}{
-			"active_id": activeID,
+			"active_id":           activeID,
 			"split_normalization": true,
-			"size":	timeFrameInMinutes * 60,
-			"to": endtime,
-			"count": count,
+			"size":                timeFrameInMinutes * 60,
+			"to":                  endtime,
+			"count":               count,
 		},
 	}
 
 	requestEvent := &RequestEvent{
-		Name:      "sendMessage",
-		Msg:       msg,
+		Name: "sendMessage",
+		Msg:  msg,
 	}
 
 	resp, err := EmitWithResponse(ws, requestEvent, "candles", timeout)

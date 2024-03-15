@@ -2,8 +2,9 @@ package wsapi
 
 import (
 	"fmt"
-	"patrickkdev/Go-IQOption-API/tjson"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/tjson"
 )
 
 type instrumentsResponseEvent struct {
@@ -11,30 +12,30 @@ type instrumentsResponseEvent struct {
 	Name      string `json:"name"`
 	Msg       struct {
 		Instruments []instrument `json:"instruments"`
-		NotFound []any `json:"not_found"`
+		NotFound    []any        `json:"not_found"`
 	} `json:"msg"`
 	Status int `json:"status"`
 }
 
 type instrument struct {
-	Index          	int     `json:"index"`
-	InstrumentType 	string  `json:"instrument_type"`
-	AssetID        	int     `json:"asset_id"`
-	TradingGroupID 	string  `json:"trading_group_id"`
-	Expiration     	int     `json:"expiration"`
-	Period         	int     `json:"period"`
-	Quote          	float64 `json:"quote"`
-	Data           	instrumentData `json:"data"`
-	Volatility     	float64 `json:"volatility"`
-	GeneratedAt    	int     `json:"generated_at"`
-	Deadtime        int `json:"deadtime"`
-	BuybackDeadtime int `json:"buyback_deadtime"`
+	Index           int            `json:"index"`
+	InstrumentType  string         `json:"instrument_type"`
+	AssetID         int            `json:"asset_id"`
+	TradingGroupID  string         `json:"trading_group_id"`
+	Expiration      int            `json:"expiration"`
+	Period          int            `json:"period"`
+	Quote           float64        `json:"quote"`
+	Data            instrumentData `json:"data"`
+	Volatility      float64        `json:"volatility"`
+	GeneratedAt     int            `json:"generated_at"`
+	Deadtime        int            `json:"deadtime"`
+	BuybackDeadtime int            `json:"buyback_deadtime"`
 }
 
 type instrumentData []struct {
-		Strike    string    `json:"strike"`   
-		Symbol    string    `json:"symbol"`   
-		Direction TradeDirection `json:"direction"`
+	Strike    string         `json:"strike"`
+	Symbol    string         `json:"symbol"`
+	Direction TradeDirection `json:"direction"`
 }
 
 func (data instrumentData) GetSymbol(direction TradeDirection) (symbol string, err error) {
@@ -49,17 +50,17 @@ func (data instrumentData) GetSymbol(direction TradeDirection) (symbol string, e
 
 func GetInstrument(ws *Socket, activeID int, exp int, timeout time.Time) (*instrument, error) {
 	msg := map[string]interface{}{
-		"name":       "digital-option-instruments.get-instruments",
-		"version":    "2.0",
-		"body":    		 map[string]interface{}{
+		"name":    "digital-option-instruments.get-instruments",
+		"version": "2.0",
+		"body": map[string]interface{}{
 			"instrument_type": "digital-option",
-			"asset_id": activeID,
-    },
+			"asset_id":        activeID,
+		},
 	}
 
 	requestEvent := &RequestEvent{
-		Name:      "sendMessage",
-		Msg:       msg,
+		Name: "sendMessage",
+		Msg:  msg,
 	}
 
 	resp, err := EmitWithResponse(ws, requestEvent, "instruments", timeout)

@@ -2,8 +2,9 @@ package wsapi
 
 import (
 	"fmt"
-	"patrickkdev/Go-IQOption-API/tjson"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/tjson"
 )
 
 type balanceResponse struct {
@@ -53,8 +54,8 @@ func GetBalances(ws *Socket, timeout time.Time) (*Balances, error) {
 	}
 
 	requestEvent := &RequestEvent{
-		Name:      "sendMessage",
-		Msg:       eventMsg,
+		Name: "sendMessage",
+		Msg:  eventMsg,
 	}
 
 	resp, err := EmitWithResponse(ws, requestEvent, "balances", timeout)

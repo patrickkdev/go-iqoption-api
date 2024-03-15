@@ -2,7 +2,8 @@ package httpapi
 
 import (
 	"encoding/json"
-	"patrickkdev/Go-IQOption-API/debug"
+
+	"github.com/patrickkdev/Go-IQOption-API/debug"
 )
 
 type LoginData struct {

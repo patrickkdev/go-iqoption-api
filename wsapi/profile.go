@@ -1,8 +1,9 @@
 package wsapi
 
 import (
-	"patrickkdev/Go-IQOption-API/tjson"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/tjson"
 )
 
 type CoreProfile struct {
@@ -108,8 +109,8 @@ func GetCoreProfile(ws *Socket, timeout time.Time) (*CoreProfile, error) {
 	}
 
 	requestEvent := &RequestEvent{
-		Name:      "sendMessage",
-		Msg:       eventMsg,
+		Name: "sendMessage",
+		Msg:  eventMsg,
 	}
 
 	resp, err := EmitWithResponse(ws, requestEvent, "profile", timeout)
@@ -160,8 +161,8 @@ func GetUserProfileClient(ws *Socket, userId int, timeout time.Time) (*UserProfi
 	}
 
 	event := &RequestEvent{
-		Name:      "sendMessage",
-		Msg:       eventMsg,
+		Name: "sendMessage",
+		Msg:  eventMsg,
 	}
 
 	resp, err := EmitWithResponse(ws, event, "user-profile-client", timeout)

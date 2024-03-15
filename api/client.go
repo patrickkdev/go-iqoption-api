@@ -3,36 +3,37 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"patrickkdev/Go-IQOption-API/data"
-	"patrickkdev/Go-IQOption-API/debug"
-	"patrickkdev/Go-IQOption-API/httpapi"
-	"patrickkdev/Go-IQOption-API/wsapi"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/data"
+	"github.com/patrickkdev/Go-IQOption-API/debug"
+	"github.com/patrickkdev/Go-IQOption-API/httpapi"
+	"github.com/patrickkdev/Go-IQOption-API/wsapi"
 )
 
 type BrokerClient struct {
-	WS     							*wsapi.Socket
-	LoginData     			*httpapi.LoginData
-	Balances      			*wsapi.Balances
-	
-	hostData      			*data.Host
-	session       			*httpapi.Session
-	
-	timeSync      			*wsapi.Timesync
-	
+	WS        *wsapi.Socket
+	LoginData *httpapi.LoginData
+	Balances  *wsapi.Balances
+
+	hostData *data.Host
+	session  *httpapi.Session
+
+	timeSync *wsapi.Timesync
+
 	// Timeout duration for requests
-	timeoutDFR 					time.Duration
-	
-	eventHandlers 			map[string]wsapi.EventCallback
+	timeoutDFR time.Duration
+
+	eventHandlers map[string]wsapi.EventCallback
 }
 
 func NewBrokerClient(hostName string, timeoutForRequests time.Duration) *BrokerClient {
 	return &BrokerClient{
-		hostData:      	data.GetHostData(hostName),
-		session:       	httpapi.NewSession(),
-		timeSync:      	wsapi.NewTimesync(),
-		eventHandlers: 	make(map[string]wsapi.EventCallback),
-		timeoutDFR: 		timeoutForRequests,
+		hostData:      data.GetHostData(hostName),
+		session:       httpapi.NewSession(),
+		timeSync:      wsapi.NewTimesync(),
+		eventHandlers: make(map[string]wsapi.EventCallback),
+		timeoutDFR:    timeoutForRequests,
 	}
 }
 
@@ -214,17 +215,17 @@ func (bC *BrokerClient) OpenTrade(type_ wsapi.TradeType, amount float64, directi
 	if !waitForResult {
 		return tradeID, false, nil
 	}
-	
+
 	win, err = bC.CheckTradeWin(tradeID, type_, timeFrameInMinutes)
 	return tradeID, win, err
 }
 
 func (bC *BrokerClient) CheckDigitalTradeResult(id int, timeFrameInMinutes int) (*wsapi.DigitalResult, bool, error) {
-	return wsapi.CheckResultDigital(bC.WS, id, bC.getTimeout().Add(time.Minute * time.Duration(timeFrameInMinutes)))
+	return wsapi.CheckResultDigital(bC.WS, id, bC.getTimeout().Add(time.Minute*time.Duration(timeFrameInMinutes)))
 }
 
 func (bC *BrokerClient) CheckBinaryTradeResult(id int, timeFrameInMinutes int) (*wsapi.BinaryResult, bool, error) {
-	return wsapi.CheckResultBinary(bC.WS, id, bC.getTimeout().Add(time.Minute * time.Duration(timeFrameInMinutes)))
+	return wsapi.CheckResultBinary(bC.WS, id, bC.getTimeout().Add(time.Minute*time.Duration(timeFrameInMinutes)))
 }
 
 func (bC *BrokerClient) CheckTradeWin(id int, type_ wsapi.TradeType, timeFrameInMinutes int) (bool, error) {

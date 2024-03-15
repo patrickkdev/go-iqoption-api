@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"patrickkdev/Go-IQOption-API/debug"
 	"sync"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/debug"
 
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
@@ -69,7 +70,7 @@ func (ws *Socket) Close() {
 }
 
 func (ws *Socket) EmitEvent(event interface{}) {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second * 15)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*15)
 
 	wsjson.Write(ctx, ws.Conn, event)
 	ctxCancel()
@@ -112,7 +113,7 @@ func (ws *Socket) handleEvent(eventB []byte) {
 
 func (ws *Socket) Listen(onLoseConnection func()) {
 	var errorCount int = 0
-	
+
 	for {
 		ctx, ctxCancel := context.WithTimeout(context.Background(), timeout)
 		defer ctxCancel()
@@ -122,7 +123,7 @@ func (ws *Socket) Listen(onLoseConnection func()) {
 			ws.Conn.Close(websocket.StatusAbnormalClosure, "close")
 			ws.Closed = true
 		}
-		
+
 		if ws.Closed {
 			onLoseConnection()
 			break

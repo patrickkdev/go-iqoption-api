@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"patrickkdev/Go-IQOption-API/api"
-	"patrickkdev/Go-IQOption-API/data"
-	"patrickkdev/Go-IQOption-API/debug"
-	"patrickkdev/Go-IQOption-API/wsapi"
 	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/api"
+	"github.com/patrickkdev/Go-IQOption-API/data"
+	"github.com/patrickkdev/Go-IQOption-API/debug"
+	"github.com/patrickkdev/Go-IQOption-API/wsapi"
 )
 
 func main() {
@@ -90,8 +91,8 @@ func startTradingBinaries(userConnection *api.BrokerClient) {
 }
 
 func connectBroker(email string, password string) *api.BrokerClient {
-	userConnection, err := api.NewBrokerClient("iqoption.com", time.Duration(time.Second * 10)).
-														 Login(email, password, nil)
+	userConnection, err := api.NewBrokerClient("iqoption.com", time.Duration(time.Second*10)).
+		Login(email, password, nil)
 
 	if err != nil {
 		panic(err)
