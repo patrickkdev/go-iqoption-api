@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"patrickkdev/Go-IQOption-API/api"
+	"patrickkdev/Go-IQOption-API/data"
 	"patrickkdev/Go-IQOption-API/debug"
 	"patrickkdev/Go-IQOption-API/wsapi"
 	"time"
@@ -18,7 +19,7 @@ func main() {
 	userConnection := connectBroker(email, password)
 	profile := getProfile(userConnection)
 
-	fmt.Printf("Olá, %s\n", profile.Name)
+	fmt.Printf("Olá, %s\n", profile.Msg.UserName)
 
 	startTradingBinaries(userConnection)
 
@@ -27,21 +28,54 @@ func main() {
 
 func startTradingBinaries(userConnection *api.BrokerClient) {
 	for {
-		tradeDirection := map[bool]wsapi.TradeDirection{
-			true:  wsapi.TradeDirectionCall,
-			false: wsapi.TradeDirectionPut,
-		}[rand.Intn(2) == 0]
+		tradeType := map[bool]wsapi.TradeType{
+			true:  wsapi.TradeTypeDigital,
+			false: wsapi.TradeTypeBinary,
+		}[rand.Float32() < 0.0]
 
-		duration := 1
+		duration := 1 // rand.Intn(4) + 1
 
-		userConnection.OpenTrade(
-			wsapi.TradeTypeBinary,
-			100,
+		pair, err := data.Pairs.GetByName("EURUSD")
+		if err != nil {
+			panic(err)
+		}
+
+		candles, err := wsapi.GetCandles(userConnection.WebSocket, 2, 60*1, int(time.Now().UnixMicro()), pair)
+		if err != nil {
+			panic(err)
+		}
+
+		// Color strategy, trade call if last candle was green
+		// and put if last candle was red
+		tradeDirection := wsapi.TradeDirectionCall
+		if candles[0].Close < candles[0].Open {
+			tradeDirection = wsapi.TradeDirectionPut
+		}
+
+		tradeID, err := userConnection.OpenTrade(
+			tradeType,
+			2,
 			tradeDirection,
-			1,
+			pair,
 			duration,
 			wsapi.TradeBalanceDemo,
 		)
+
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		fmt.Printf("Successully opened trade of type '%s' with ID '%d'\nWaiting result...\n", tradeType, tradeID)
+
+		if tradeType == wsapi.TradeTypeBinary {
+			result, err := wsapi.CheckResultBinary(userConnection.WebSocket, tradeID)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			debug.PrintAsJSON(result)
+		}
 
 		time.Sleep(time.Minute * time.Duration(duration))
 	}

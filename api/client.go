@@ -126,6 +126,10 @@ func (bC *BrokerClient) GetBalances(shouldUpdate bool) (*wsapi.Balances, error) 
 			return nil, err
 		}
 
+		for _, balance := range *balances {
+			bC.WebSocket.EmitEvent(wsapi.GetSubscriptionToPositionChanged(balance.UserID, balance.ID))
+		}
+
 		bC.Balances = balances
 		return balances, nil
 	}

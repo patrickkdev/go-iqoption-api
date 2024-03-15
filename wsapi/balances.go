@@ -15,14 +15,14 @@ type balanceResponse struct {
 
 type Balance struct {
 	ID                int         `json:"id"`
-	UserID            int64       `json:"user_id"`
+	UserID            int         `json:"user_id"`
 	Type              int         `json:"type"`
 	Amount            float64     `json:"amount"`
 	EnrolledAmount    float64     `json:"enrolled_amount"`
 	EnrolledSumAmount float64     `json:"enrolled_sum_amount"`
-	BonusAmount       int64       `json:"bonus_amount"`
-	HoldAmount        int64       `json:"hold_amount"`
-	OrdersAmount      int64       `json:"orders_amount"`
+	BonusAmount       int         `json:"bonus_amount"`
+	HoldAmount        int         `json:"hold_amount"`
+	OrdersAmount      int         `json:"orders_amount"`
 	Currency          string      `json:"currency"`
 	TournamentID      interface{} `json:"tournament_id"`
 	TournamentName    interface{} `json:"tournament_name"`
