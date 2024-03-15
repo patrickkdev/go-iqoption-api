@@ -1,56 +1,123 @@
 package wsapi
 
-import "fmt"
-
-type TradeDirection string
-
-const (
-	TradeDirectionCall TradeDirection = "call"
-	TradeDirectionPut  TradeDirection = "put"
+import (
+	"fmt"
+	"patrickkdev/Go-IQOption-API/debug"
+	"patrickkdev/Go-IQOption-API/tjson"
+	"time"
 )
 
+type TradeDirection string
+type TradeBalance int
 type TradeType string
 
 const (
-	TradeTypeDigital TradeType = "digital"
-	TradeTypeBinary  TradeType = "binary"
+	TradeDirectionCall 		TradeDirection = "call"
+	TradeDirectionPut  		TradeDirection = "put"
 )
-
-type TradeBalance int
 
 const (
-	TradeBalanceDemo TradeBalance = 4
+	TradeBalanceDemo 			TradeBalance = 4
 )
 
-func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64) (orderID int, err error) {
+const (
+	TradeTypeDigital 	TradeType = 	"digital"
+	TradeTypeBinary  	TradeType = 	"binary"
+)
+
+type tradeDigitalResponseEvent struct {
+	RequestID 						string 				`json:"request_id"`
+	Name      						string 				`json:"name"`      
+	Msg       						struct {		
+		ID 									int 					`json:"id"`
+	}    																`json:"msg"`       
+	Status    						int  					`json:"status"`    
+}
+
+type tradeBinaryResponseEvent struct {
+	RequestID 						string 				`json:"request_id"`
+	Name      						string 				`json:"name"`      
+	Msg       						struct {
+		UserID             	int64       	`json:"user_id"`            
+		ID                 	int     			`json:"id"`                 
+		RefundValue        	int64       	`json:"refund_value"`       
+		Price              	int64       	`json:"price"`              
+		Exp                	int64       	`json:"exp"`                
+		Created            	int64       	`json:"created"`            
+		CreatedMillisecond 	int64       	`json:"created_millisecond"`
+		TimeRate           	int64       	`json:"time_rate"`          
+		Type               	string      	`json:"type"`               
+		Act                	int64       	`json:"act"`                
+		Direction          	string      	`json:"direction"`          
+		ExpValue           	int64       	`json:"exp_value"`          
+		Value              	float64     	`json:"value"`              
+		ProfitIncome       	int64       	`json:"profit_income"`      
+		ProfitReturn       	int64       	`json:"profit_return"`      
+		RobotID            	interface{} 	`json:"robot_id"`           
+		ClientPlatformID   	int64       	`json:"client_platform_id"` 
+	}    																`json:"msg"`       
+	Status    						int64  				`json:"status"`    
+}
+
+func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64) (tradeID int, err error) {
+	exp, _ := GetExpirationTime(serverTimeStamp, duration)
+
+	instrument, err := GetInstrument(ws, activeID, exp, serverTimeStamp)
+	if err != nil {
+		return 0, err
+	}
+
+	instrumentID, err := instrument.Data.GetSymbol(direction)
+	if err != nil {
+		return 0, err
+	}
+
 	eventMsg := map[string]interface{}{
 		"name":    "digital-options.place-digital-option",
 		"version": "3.0",
 		"body": map[string]interface{}{
-			"amount":           amount,
+			"amount":           fmt.Sprint(amount),
 			"asset_id":         activeID,
-			"instrument_id":    "do76A20240312D204000T1MCSPT",
-			"instrument_index": 2307938,
+			"instrument_id":    instrumentID,
+			"instrument_index": instrument.Index,
 			"user_balance_id":  targetBalanceID,
 		},
 	}
 
-	requestEvent := &Event{
+	requestEvent := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       eventMsg,
 		RequestId: fmt.Sprint(serverTimeStamp),
-		LocalTime: serverTimeStamp,
+		LocalTime: int64(serverTimeStamp/1000),
 	}
 
-	ws.EmitEvent(requestEvent)
+	debug.IfVerbose.Println("requestEvent:")
+	debug.IfVerbose.PrintAsJSON(requestEvent)
 
-	return 2, nil
+	resp, err := EmitWithResponse(ws, requestEvent, "digital-option-placed", time.Now().Add(10*time.Second))
+	if err != nil {
+		return 0, err
+	}
+
+	responseEvent, err := tjson.Unmarshal[tradeDigitalResponseEvent](resp)
+	if err != nil {
+		return 0, err
+	}
+
+	debug.IfVerbose.Println("responseEvent:")
+	debug.IfVerbose.PrintAsJSON(responseEvent)
+
+	if responseEvent.Msg.ID == 0 {
+		return 0, fmt.Errorf("error placing trade")
+	}
+
+	return responseEvent.Msg.ID, nil
 }
 
-func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64) {
-	exp, idx := GetExpirationTime(serverTimeStamp, duration)
 
-	fmt.Println("expiration time: ", idx)
+func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64) (tradeID int, err error) {
+	exp, idx := GetExpirationTime(serverTimeStamp, duration)
+	debug.IfVerbose.Println("expiration time: ", idx)
 
 	optionTypeID := map[bool]int{
 		true:  3, // turbo
@@ -70,12 +137,32 @@ func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID 
 		},
 	}
 
-	requestEvent := &Event{
+	requestEvent := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       eventMsg,
 		RequestId: fmt.Sprint(serverTimeStamp),
-		LocalTime: serverTimeStamp,
+		LocalTime: int64(serverTimeStamp/1000),
 	}
 
-	ws.EmitEvent(requestEvent)
+	debug.IfVerbose.Println("requestEvent:")
+	debug.IfVerbose.PrintAsJSON(requestEvent)
+
+	resp, err := EmitWithResponse(ws, requestEvent, "option", time.Now().Add(10 *time.Second))
+	if err != nil {
+		return 0, err
+	}
+
+	responseEvent, err := tjson.Unmarshal[tradeBinaryResponseEvent](resp)
+	if err != nil {
+		return 0, err
+	}
+
+	debug.IfVerbose.Println("responseEvent:")
+	debug.IfVerbose.PrintAsJSON(responseEvent)
+
+	if responseEvent.Msg.ID == 0 {
+		return 0, fmt.Errorf("error placing trade")
+	}
+	
+	return responseEvent.Msg.ID, nil
 }

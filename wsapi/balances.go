@@ -52,7 +52,7 @@ func GetBalances(ws *Socket, serverTimeStamp int64) (*Balances, error) {
 		"version": "1.0",
 	}
 
-	requestEvent := &Event{
+	requestEvent := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       eventMsg,
 		RequestId: fmt.Sprint(serverTimeStamp),

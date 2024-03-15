@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"time"
-
 	"patrickkdev/Go-IQOption-API/api"
 	"patrickkdev/Go-IQOption-API/debug"
 	"patrickkdev/Go-IQOption-API/wsapi"
+	"time"
 )
 
 func main() {
@@ -19,7 +18,7 @@ func main() {
 	userConnection := connectBroker(email, password)
 	profile := getProfile(userConnection)
 
-	fmt.Printf("Olá, %d\n", profile.Msg.UserID)
+	fmt.Printf("Olá, %s\n", profile.Name)
 
 	startTradingBinaries(userConnection)
 

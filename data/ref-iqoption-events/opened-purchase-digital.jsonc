@@ -44,6 +44,33 @@
 // Client 👨‍💻->->->->🌎
 {
   "name": "sendMessage",
+  "request_id": "1710423802",
+  "local_time": 1710423802,
+  "msg": {
+    "name": "digital-options.place-digital-option",
+    "version": "2.0",
+    "body": {
+      "user_balance_id": 112647980,
+      "instrument_id": "do1A20240314D134300T1MPSPT",
+      "amount": "100",
+      "instrument_index": 0,
+      "asset_id": 1
+    }
+  },
+  "version": ""
+},
+// 👨‍💻<-<-<-<-🌎 Server
+{
+  "request_id": "1710423802",
+  "name": "digital-option-placed",
+  "msg": {
+    "id": 0
+  },
+  "status": 4007
+},
+// Client 👨‍💻->->->->🌎
+{
+  "name": "sendMessage",
   "request_id": "808",
   "local_time": 546734,
   "msg": {

@@ -2,28 +2,23 @@ package wsapi
 
 import (
 	"fmt"
+	"math/rand"
 	"patrickkdev/Go-IQOption-API/debug"
 	"time"
 )
 
-type Event struct {
+type RequestEvent struct {
 	Name      string      `json:"name"`
 	Msg       interface{} `json:"msg"`
-	Version   string      `json:"version"`
 	RequestId string      `json:"request_id"`
+	// Version   string      `json:"version"`
 	LocalTime int64       `json:"local_time"`
 }
 
-func NewEvent(name string, msg map[string]interface{}, requestId string) *Event {
-	return &Event{
-		Name:      name,
-		Msg:       msg,
-		Version:   "1.0",
-		RequestId: requestId,
-	}
-}
+func EmitWithResponse(ws *Socket, event *RequestEvent, responseEventName string, timeout time.Time) (resp []byte, err error) {
+	
+	event.RequestId = fmt.Sprint(rand.Int63n(10000000000))
 
-func EmitWithResponse(ws *Socket, event *Event, responseEventName string, timeout time.Time) (resp []byte, err error) {
 	ws.EmitEvent(event)
 
 	ws.AddEventListener(responseEventName, func(responseEvent []byte) {
@@ -53,4 +48,25 @@ func EmitWithResponse(ws *Socket, event *Event, responseEventName string, timeou
 	}
 
 	return resp, nil
+}
+
+func CreateUserAvailabilityEvent(activeID int) *RequestEvent {
+	msg := map[string]interface{}{
+		"name": "update-user-availability",
+		"version": "1.1",
+		"body": map[string]interface{} {
+			"platform_id": "9",
+			"idle_duration": 22,
+			"selected_asset_id": activeID,
+			"selected_asset_type": 7,
+		},
+	}
+
+	requestEvent := &RequestEvent{
+		Name:      "sendMessage",
+		Msg:       msg,
+		RequestId: "0",
+	}
+
+	return requestEvent
 }

@@ -14,16 +14,16 @@ type AuthenticationResponse struct {
 }
 
 func Authenticate(ws *Socket, ssid string, serverTimeStamp int, timeout time.Time) (*AuthenticationResponse, error) {
-	requestEvent := NewEvent(
-		"authenticate",
-		map[string]interface{}{
+	requestEvent := &RequestEvent{
+		Name: "authenticate",
+		Msg: map[string]interface{}{
 			"ssid":              ssid,
 			"protocol":          3,
 			"client_session_id": "",
 			"session_id":        "",
 		},
-		fmt.Sprint(serverTimeStamp),
-	)
+		RequestId: fmt.Sprint(serverTimeStamp),
+	}
 
 	resp, err := EmitWithResponse(ws, requestEvent, "authenticated", timeout)
 	if err != nil {

@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"patrickkdev/Go-IQOption-API/data"
 	"patrickkdev/Go-IQOption-API/debug"
 	"patrickkdev/Go-IQOption-API/httpapi"
@@ -16,6 +17,7 @@ type BrokerClient struct {
 	WebSocket     *wsapi.Socket
 	EventHandlers map[string]wsapi.EventCallback
 	TimeSync      *wsapi.Timesync
+	Balances      *wsapi.Balances
 }
 
 func NewBrokerClient(hostName string) *BrokerClient {
@@ -81,14 +83,21 @@ func (bC *BrokerClient) ConnectSocket() error {
 		time.Now().Add(5*time.Second),
 	)
 
-	debug.PrintAsJSON(resp)
-
 	if err != nil {
 		debug.IfVerbose.Println("Authentication error: ", err.Error())
 		bC.WebSocket.Close()
 		bC.WebSocket.WaitGroup.Done()
 		return err
 	}
+
+	if !resp.Msg {
+		error_ := fmt.Errorf("authentication error")
+		debug.IfVerbose.Println(error_)
+		debug.IfVerbose.PrintAsJSON(resp)
+		return error_
+	}
+
+	fmt.Println("Authenticated successfully")
 
 	return nil
 }
@@ -110,8 +119,22 @@ func (bC *BrokerClient) GetProfileClient(userId int) (*wsapi.UserProfileClient, 
 	)
 }
 
+func (bC *BrokerClient) GetBalances(shouldUpdate bool) (*wsapi.Balances, error) {
+	if bC.Balances == nil || shouldUpdate {
+		balances, err := wsapi.GetBalances(bC.WebSocket, bC.TimeSync.GetServerTimestamp())
+		if err != nil {
+			return nil, err
+		}
+
+		bC.Balances = balances
+		return balances, nil
+	}
+
+	return bC.Balances, nil
+}
+
 func (bC *BrokerClient) OpenTrade(type_ wsapi.TradeType, amount float64, direction wsapi.TradeDirection, activeID int, duration int, balance wsapi.TradeBalance) (int, error) {
-	balances, err := wsapi.GetBalances(bC.WebSocket, bC.TimeSync.GetServerTimestamp())
+	balances, err := bC.GetBalances(false)
 	if err != nil {
 		return 0, err
 	}
@@ -123,7 +146,7 @@ func (bC *BrokerClient) OpenTrade(type_ wsapi.TradeType, amount float64, directi
 
 	switch type_ {
 	case wsapi.TradeTypeBinary:
-		wsapi.TradeBinary(
+		return wsapi.TradeBinary(
 			bC.WebSocket,
 			amount,
 			direction,
@@ -133,7 +156,7 @@ func (bC *BrokerClient) OpenTrade(type_ wsapi.TradeType, amount float64, directi
 			bC.TimeSync.GetServerTimestamp(),
 		)
 	case wsapi.TradeTypeDigital:
-		wsapi.TradeDigital(
+		return wsapi.TradeDigital(
 			bC.WebSocket,
 			amount,
 			direction,
