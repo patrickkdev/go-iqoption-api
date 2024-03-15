@@ -100,7 +100,7 @@ type deposit struct {
 	Min int64 `json:"min"`
 }
 
-func GetCoreProfile(ws *Socket, serverTimeStamp int64, timeout time.Time) (*CoreProfile, error) {
+func GetCoreProfile(ws *Socket, timeout time.Time) (*CoreProfile, error) {
 	eventMsg := map[string]interface{}{
 		"name":    "core.get-profile",
 		"body":    map[string]interface{}{},
@@ -110,10 +110,9 @@ func GetCoreProfile(ws *Socket, serverTimeStamp int64, timeout time.Time) (*Core
 	requestEvent := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       eventMsg,
-		RequestId: "2",
 	}
 
-	resp, err := EmitWithResponse(ws, requestEvent, "profile", time.Now().Add(1*time.Minute))
+	resp, err := EmitWithResponse(ws, requestEvent, "profile", timeout)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +150,7 @@ type UserProfileClient struct {
 	Status int `json:"status"`
 }
 
-func GetUserProfileClient(ws *Socket, userId int, serverTimeStamp int64, timeout time.Time) (*UserProfileClient, error) {
+func GetUserProfileClient(ws *Socket, userId int, timeout time.Time) (*UserProfileClient, error) {
 	eventMsg := map[string]interface{}{
 		"name": "get-user-profile-client",
 		"body": map[string]interface{}{
@@ -163,7 +162,6 @@ func GetUserProfileClient(ws *Socket, userId int, serverTimeStamp int64, timeout
 	event := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       eventMsg,
-		RequestId: "157",
 	}
 
 	resp, err := EmitWithResponse(ws, event, "user-profile-client", timeout)

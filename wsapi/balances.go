@@ -45,7 +45,7 @@ func (b *Balances) FindByType(type_ TradeBalance) (*Balance, error) {
 	return nil, fmt.Errorf("balance not found")
 }
 
-func GetBalances(ws *Socket, serverTimeStamp int64) (*Balances, error) {
+func GetBalances(ws *Socket, timeout time.Time) (*Balances, error) {
 	eventMsg := map[string]interface{}{
 		"name":    "get-balances",
 		"body":    map[string]interface{}{},
@@ -55,10 +55,9 @@ func GetBalances(ws *Socket, serverTimeStamp int64) (*Balances, error) {
 	requestEvent := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       eventMsg,
-		RequestId: fmt.Sprint(serverTimeStamp),
 	}
 
-	resp, err := EmitWithResponse(ws, requestEvent, "balances", time.Now().Add(10*time.Second))
+	resp, err := EmitWithResponse(ws, requestEvent, "balances", timeout)
 	if err != nil {
 		return nil, err
 	}

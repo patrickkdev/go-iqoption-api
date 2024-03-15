@@ -34,14 +34,14 @@ func (candles Candles) GetLast() (candle Candle) {
 	return candles[len(candles)-1]
 }
 
-func GetCandles (ws *Socket, count int, timeFrame int, endtime int, activeID int) (candles Candles, err error) {
+func GetCandles(ws *Socket, count int, timeFrameInMinutes int, endtime int64, activeID int, timeout time.Time) (candles Candles, err error) {
 	msg := map[string]interface{}{
 		"name": "get-candles",
 		"version": "2.0",
 		"body": map[string]interface{}{
 			"active_id": activeID,
 			"split_normalization": true,
-			"size": timeFrame,
+			"size":	timeFrameInMinutes * 60,
 			"to": endtime,
 			"count": count,
 		},
@@ -52,7 +52,7 @@ func GetCandles (ws *Socket, count int, timeFrame int, endtime int, activeID int
 		Msg:       msg,
 	}
 
-	resp, err := EmitWithResponse(ws, requestEvent, "candles", time.Now().Add(10*time.Second))
+	resp, err := EmitWithResponse(ws, requestEvent, "candles", timeout)
 	if err != nil {
 		return nil, err
 	}

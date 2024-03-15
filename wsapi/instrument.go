@@ -47,7 +47,7 @@ func (data instrumentData) GetSymbol(direction TradeDirection) (symbol string, e
 	return "", fmt.Errorf("no symbol found for direction %s", direction)
 }
 
-func GetInstrument(ws *Socket, activeID int, exp int, serverTimestamp int64) (*instrument, error) {
+func GetInstrument(ws *Socket, activeID int, exp int, timeout time.Time) (*instrument, error) {
 	msg := map[string]interface{}{
 		"name":       "digital-option-instruments.get-instruments",
 		"version":    "2.0",
@@ -60,10 +60,9 @@ func GetInstrument(ws *Socket, activeID int, exp int, serverTimestamp int64) (*i
 	requestEvent := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       msg,
-		RequestId: fmt.Sprint(serverTimestamp),
 	}
 
-	resp, err := EmitWithResponse(ws, requestEvent, "instruments", time.Now().Add(1*time.Minute))
+	resp, err := EmitWithResponse(ws, requestEvent, "instruments", timeout)
 	if err != nil {
 		return nil, err
 	}

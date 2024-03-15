@@ -11,12 +11,9 @@ type RequestEvent struct {
 	Name      string      `json:"name"`
 	Msg       interface{} `json:"msg"`
 	RequestId string      `json:"request_id"`
-	// Version   string      `json:"version"`
-	LocalTime int64       `json:"local_time"`
 }
 
 func EmitWithResponse(ws *Socket, event *RequestEvent, responseEventName string, timeout time.Time) (resp []byte, err error) {
-	
 	event.RequestId = fmt.Sprint(rand.Int63n(10000000000))
 
 	ws.EmitEvent(event)
@@ -28,14 +25,19 @@ func EmitWithResponse(ws *Socket, event *RequestEvent, responseEventName string,
 	debug.IfVerbose.Println("waiting for " + responseEventName + "...")
 
 	for {
-		if resp != nil {
-			debug.IfVerbose.Println("response " + responseEventName + " found")
+		if ws.Closed {
+			err = fmt.Errorf("websocket connection closed :: func EmitWithResponse (" + responseEventName + ")")
 			break
 		}
 
 		if time.Since(timeout) > 0 {
-			err = fmt.Errorf("timed out waiting for response" + responseEventName)
+			err = fmt.Errorf("timed out waiting for response: " + responseEventName)
 			debug.IfVerbose.Println(err.Error())
+			break
+		}
+
+		if resp != nil {
+			debug.IfVerbose.Println("response " + responseEventName + " found")
 			break
 		}
 	}
@@ -50,23 +52,8 @@ func EmitWithResponse(ws *Socket, event *RequestEvent, responseEventName string,
 	return resp, nil
 }
 
-func CreateUserAvailabilityEvent(activeID int) *RequestEvent {
-	msg := map[string]interface{}{
-		"name": "update-user-availability",
-		"version": "1.1",
-		"body": map[string]interface{} {
-			"platform_id": "9",
-			"idle_duration": 22,
-			"selected_asset_id": activeID,
-			"selected_asset_type": 7,
-		},
-	}
-
-	requestEvent := &RequestEvent{
-		Name:      "sendMessage",
-		Msg:       msg,
-		RequestId: "0",
-	}
-
-	return requestEvent
+func Emit(ws *Socket, event *RequestEvent) {
+	event.RequestId = fmt.Sprint(rand.Int63n(10000000000))
+	
+	ws.EmitEvent(event)
 }

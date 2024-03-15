@@ -1,9 +1,7 @@
 package wsapi
 
 import (
-	"fmt"
 	"patrickkdev/Go-IQOption-API/debug"
-	"time"
 )
 
 type Heartbeat struct {
@@ -11,17 +9,12 @@ type Heartbeat struct {
 	Msg  int 		`json:"msg"`
 }
 
-func AnswerHeartbeat(ws *Socket, heartbeatFromServer Heartbeat, serverTimestamp int64) {
-		now := time.Now()
-		unixTime := now.UnixNano()
-		requestId := fmt.Sprint(unixTime)[10:18]
-	
+func AnswerHeartbeat(ws *Socket, heartbeatFromServer Heartbeat, serverTimestamp int64) {	
 		heartbeatTime := int(heartbeatFromServer.Msg)
 
-		debug.If(bool(debug.IfVerbose) && false).Println("Received heartbeat from server at:", int(heartbeatTime))
+		debug.IfVerbose.Println("Heartbeat:", int(heartbeatTime))
 	
 		heartbeatFromClient := &RequestEvent{
-			RequestId: requestId,
 			Name:      "heartbeat",
 			Msg:       map[string]interface{}{
 				"heartbeatTime": heartbeatTime,
@@ -29,5 +22,5 @@ func AnswerHeartbeat(ws *Socket, heartbeatFromServer Heartbeat, serverTimestamp 
 			},
 		}
 	
-		ws.EmitEvent(heartbeatFromClient)
+		Emit(ws, heartbeatFromClient)
 }

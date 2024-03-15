@@ -59,10 +59,10 @@ type tradeBinaryResponseEvent struct {
 	Status    						int64  				`json:"status"`    
 }
 
-func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64) (tradeID int, err error) {
+func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64, timeout time.Time) (tradeID int, err error) {
 	exp, _ := GetExpirationTime(serverTimeStamp, duration)
 
-	instrument, err := GetInstrument(ws, activeID, exp, serverTimeStamp)
+	instrument, err := GetInstrument(ws, activeID, exp, timeout)
 	if err != nil {
 		return 0, err
 	}
@@ -87,14 +87,12 @@ func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID
 	requestEvent := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       eventMsg,
-		RequestId: fmt.Sprint(serverTimeStamp),
-		LocalTime: int64(serverTimeStamp/1000),
 	}
 
 	debug.IfVerbose.Println("requestEvent:")
 	debug.IfVerbose.PrintAsJSON(requestEvent)
 
-	resp, err := EmitWithResponse(ws, requestEvent, "digital-option-placed", time.Now().Add(10*time.Second))
+	resp, err := EmitWithResponse(ws, requestEvent, "digital-option-placed", timeout)
 	if err != nil {
 		return 0, err
 	}
@@ -115,7 +113,7 @@ func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID
 }
 
 
-func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64) (tradeID int, err error) {
+func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64, timeout time.Time) (tradeID int, err error) {
 	exp, idx := GetExpirationTime(serverTimeStamp, duration)
 	debug.IfVerbose.Println("expiration time: ", idx)
 
@@ -140,14 +138,12 @@ func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID 
 	requestEvent := &RequestEvent{
 		Name:      "sendMessage",
 		Msg:       eventMsg,
-		RequestId: fmt.Sprint(serverTimeStamp),
-		LocalTime: int64(serverTimeStamp/1000),
 	}
 
 	debug.IfVerbose.Println("requestEvent:")
 	debug.IfVerbose.PrintAsJSON(requestEvent)
 
-	resp, err := EmitWithResponse(ws, requestEvent, "option", time.Now().Add(10 *time.Second))
+	resp, err := EmitWithResponse(ws, requestEvent, "option", timeout)
 	if err != nil {
 		return 0, err
 	}

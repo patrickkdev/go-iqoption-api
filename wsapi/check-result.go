@@ -1,6 +1,8 @@
 package wsapi
 
 import (
+	"fmt"
+	"patrickkdev/Go-IQOption-API/debug"
 	"patrickkdev/Go-IQOption-API/tjson"
 	"time"
 )
@@ -181,55 +183,132 @@ type DigitalResult struct {
 	Swap                   int     `json:"swap"`
 }
 
-func CheckResultBinary(ws *Socket, tradeID int) (*BinaryResult, error) {
+func CheckResultBinary(ws *Socket, tradeID int, timeout time.Time) (*BinaryResult, bool, error) {
+	debug.IfVerbose.Printf("Calling check result binary with tradeID: %d\n", tradeID)
+
 	var err error = nil
 	var res binaryCheckResultResponse
 
 	ws.AddEventListener("position-changed", func(event []byte) {
 		res, err = tjson.Unmarshal[binaryCheckResultResponse](event)
+
+		debug.IfVerbose.Println("Position changed for binary trade")
+		debug.IfVerbose.PrintAsJSON(res)
 	})
 
-	for res.Msg.ExternalID != tradeID && res.Msg.Status != "closed" {
+	for res.Msg.ExternalID != tradeID || res.Msg.Status != "closed" {
 		time.Sleep(time.Second)
 
-		println(res.Msg.Status, res.Msg.ExternalID, tradeID)
+		if ws.Closed {
+			err = fmt.Errorf("websocket closed")
+			break
+		}
+
+		if time.Since(timeout) > 0 {
+			err = fmt.Errorf("timed out waiting for response")
+			break
+		}
+
+		debug.IfVerbose.Println("Position changed for binary trade:", res.Msg.Status, res.Msg.ExternalID, tradeID)
 	}
 
 	ws.RemoveEventListener("position-changed")
 
-	return &res.Msg, err
+	win := res.Msg.CloseReason == "win"
+	debug.IfVerbose.Println("Result:", res.Msg.Status, res.Msg.ExternalID, tradeID, win)
+
+	if err != nil {
+		return nil, false, err
+	}
+
+	return &res.Msg, res.Msg.CloseReason == "win", err
 }
 
-func CheckResultDigital(ws *Socket, tradeID int) (*DigitalResult, error) {
+func CheckResultDigital(ws *Socket, tradeID int, timeout time.Time) (*DigitalResult, bool, error) {
+	debug.IfVerbose.Printf("Calling check result digital with tradeID: %d\n", tradeID)
+
 	var err error = nil
-	var res *digitalCheckResultResponse
+	var res digitalCheckResultResponse
 
 	ws.AddEventListener("position-changed", func(event []byte) {
-		res, err = tjson.Unmarshal[*digitalCheckResultResponse](event)
+		res, err = tjson.Unmarshal[digitalCheckResultResponse](event)
+
+		debug.IfVerbose.Println("Position changed for digital trade")
+		debug.IfVerbose.PrintAsJSON(res)
 	})
 
-	for res.Msg.ExternalID != tradeID && res.Msg.Status != "closed" {
+	for {
 		time.Sleep(time.Second)
+
+		if ws.Closed {
+			err = fmt.Errorf("websocket closed")
+			break
+		}
+
+		if time.Since(timeout) > 0 {
+			err = fmt.Errorf("timed out waiting for response")
+		}
+
+		orderIDs := res.Msg.RawEvent.DigitalOptionsPositionChanged1.OrderIds
+
+		if len(orderIDs) == 0 {
+			continue
+		}
+
+		orderID := res.Msg.RawEvent.DigitalOptionsPositionChanged1.OrderIds[0]
+
+		if orderID != tradeID {
+			continue
+		}
+
+		debug.IfVerbose.Println("Position changed for digital trade:", res.Msg.Status, orderID, tradeID)
+		
+		if res.Msg.Status != "closed" {
+			continue			
+		}
+
+		break
 	}
 
 	ws.RemoveEventListener("position-changed")
 
-	return &res.Msg, err
+	win := res.Msg.Pnl > 0
+	debug.IfVerbose.Println("Check result digital: ", res.Msg.Pnl, win)
+	
+	if err != nil {
+		return nil, false, err
+	}
+
+	return &res.Msg, win, err
 }
 
-func GetSubscriptionToPositionChanged(userID int, userBalanceID int) *RequestEvent {
-	return &RequestEvent{
-		Name: "subscribeMessage",
-		Msg: map[string]interface{}{
-			"name":    "portfolio.position-changed",
-			"version": "3.0",
-			"params": map[string]interface{}{
-				"routingFilters": map[string]interface{}{
-					"user_id":         userID,
-					"user_balance_id": userBalanceID,
-					"instrument_type": "exchange-option",
+func GetSubscriptionsToPositionChangedEvent(userID int, userBalanceID int) []*RequestEvent {
+	var intrumentTypesForSubscription = []string{
+		"binary-option",
+		"digital-option",
+		"turbo-option",
+	}
+
+	var requestEvents = make([]*RequestEvent, 0)
+
+	for _, instrumentTypeForSubscription := range intrumentTypesForSubscription {
+		newRequest := &RequestEvent{
+			Name: "subscribeMessage",
+			Msg: map[string]interface{}{
+				"name":    "portfolio.position-changed",
+				"version": "3.0",
+				"params": map[string]interface{}{
+					"routingFilters": map[string]interface{}{
+						"user_id":         userID,
+						"user_balance_id": userBalanceID,
+						"instrument_type": instrumentTypeForSubscription,
+					},
 				},
 			},
-		},
+		}
+
+		requestEvents = append(requestEvents, newRequest)
 	}
+
+	return requestEvents
 }

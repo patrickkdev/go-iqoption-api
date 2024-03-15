@@ -1,7 +1,6 @@
 package wsapi
 
 import (
-	"fmt"
 	"patrickkdev/Go-IQOption-API/tjson"
 	"time"
 )
@@ -13,7 +12,7 @@ type AuthenticationResponse struct {
 	RequestID       string `json:"request_id"`
 }
 
-func Authenticate(ws *Socket, ssid string, serverTimeStamp int, timeout time.Time) (*AuthenticationResponse, error) {
+func Authenticate(ws *Socket, ssid string, timeout time.Time) (*AuthenticationResponse, error) {
 	requestEvent := &RequestEvent{
 		Name: "authenticate",
 		Msg: map[string]interface{}{
@@ -22,7 +21,6 @@ func Authenticate(ws *Socket, ssid string, serverTimeStamp int, timeout time.Tim
 			"client_session_id": "",
 			"session_id":        "",
 		},
-		RequestId: fmt.Sprint(serverTimeStamp),
 	}
 
 	resp, err := EmitWithResponse(ws, requestEvent, "authenticated", timeout)

@@ -23,26 +23,35 @@ func main() {
 
 	startTradingBinaries(userConnection)
 
-	userConnection.WebSocket.WaitGroup.Wait()
+	userConnection.WS.WaitGroup.Wait()
 }
 
 func startTradingBinaries(userConnection *api.BrokerClient) {
 	for {
+		if userConnection.WS.Closed {
+			fmt.Println("No connection with socket")
+
+			time.Sleep(time.Second)
+			continue
+		}
+
 		tradeType := map[bool]wsapi.TradeType{
 			true:  wsapi.TradeTypeDigital,
 			false: wsapi.TradeTypeBinary,
-		}[rand.Float32() < 0.0]
+		}[rand.Float32() < 0.5]
 
-		duration := 1 // rand.Intn(4) + 1
+		duration := rand.Intn(4) + 1
 
-		pair, err := data.Pairs.GetByName("EURUSD")
+		pair, err := data.Pairs.GetByName("EURUSD-OTC")
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			continue
 		}
 
-		candles, err := wsapi.GetCandles(userConnection.WebSocket, 2, 60*1, int(time.Now().UnixMicro()), pair)
+		candles, err := userConnection.GetCandles(20, 1, time.Now().UnixMicro(), pair)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			continue
 		}
 
 		// Color strategy, trade call if last candle was green
@@ -52,37 +61,38 @@ func startTradingBinaries(userConnection *api.BrokerClient) {
 			tradeDirection = wsapi.TradeDirectionPut
 		}
 
-		tradeID, err := userConnection.OpenTrade(
+		fmt.Printf("Opening %s trade. Direction: %s. Pair: %d. Duration: %d minutes\n", tradeType, tradeDirection, pair, duration)
+
+		_, win, err := userConnection.OpenTrade(
 			tradeType,
 			2,
 			tradeDirection,
 			pair,
 			duration,
 			wsapi.TradeBalanceDemo,
+			true,
 		)
 
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error opening trade:", err)
 			continue
 		}
 
-		fmt.Printf("Successully opened trade of type '%s' with ID '%d'\nWaiting result...\n", tradeType, tradeID)
+		tradeResult := map[bool]string{
+			true:  "win",
+			false: "lose",
+		}[win]
 
-		if tradeType == wsapi.TradeTypeBinary {
-			result, err := wsapi.CheckResultBinary(userConnection.WebSocket, tradeID)
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			debug.PrintAsJSON(result)
-		}
+		fmt.Printf("Trade result: %s\n", tradeResult)
 
-		time.Sleep(time.Minute * time.Duration(duration))
+		time.Sleep(time.Second)
 	}
 }
 
 func connectBroker(email string, password string) *api.BrokerClient {
-	userConnection, err := api.NewBrokerClient("iqoption.com").Login(email, password, nil)
+	userConnection, err := api.NewBrokerClient("iqoption.com", time.Duration(time.Second * 10)).
+														 Login(email, password, nil)
+
 	if err != nil {
 		panic(err)
 	}

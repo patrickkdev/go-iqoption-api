@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"patrickkdev/Go-IQOption-API/debug"
 	"sync"
+	"time"
 
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
@@ -18,12 +19,14 @@ type Socket struct {
 	Conn          *websocket.Conn
 	Closed        bool
 	eventHandlers map[string]EventCallback
-	ctx           context.Context
 	WaitGroup     *sync.WaitGroup
 }
 
-func NewSocketConnection(url string) (*Socket, error) {
-	ctx := context.Background()
+const timeout = time.Second * 15
+
+func NewSocketConnection(url string, onLoseConnection func()) (*Socket, error) {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), timeout)
+	defer ctxCancel()
 
 	var header http.Header = http.Header{}
 	header.Add("check_hostname", "false")
@@ -47,7 +50,6 @@ func NewSocketConnection(url string) (*Socket, error) {
 
 	newSocketConnection := &Socket{
 		eventHandlers: make(map[string]EventCallback),
-		ctx:           ctx,
 		Conn:          conn,
 		Closed:        false,
 		WaitGroup:     new(sync.WaitGroup),
@@ -57,7 +59,7 @@ func NewSocketConnection(url string) (*Socket, error) {
 
 	newSocketConnection.WaitGroup.Add(1)
 
-	go newSocketConnection.Listen()
+	go newSocketConnection.Listen(onLoseConnection)
 
 	return newSocketConnection, nil
 }
@@ -67,7 +69,10 @@ func (ws *Socket) Close() {
 }
 
 func (ws *Socket) EmitEvent(event interface{}) {
-	wsjson.Write(ws.ctx, ws.Conn, event)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second * 15)
+
+	wsjson.Write(ctx, ws.Conn, event)
+	ctxCancel()
 }
 
 func (ws *Socket) AddEventListener(name string, callback EventCallback) {
@@ -105,24 +110,26 @@ func (ws *Socket) handleEvent(eventB []byte) {
 	callback(eventB)
 }
 
-func (ws *Socket) Listen() {
-	defer ws.WaitGroup.Done()
-
+func (ws *Socket) Listen(onLoseConnection func()) {
 	var errorCount int = 0
-
+	
 	for {
-		if ws.Closed {
-			break
-		}
+		ctx, ctxCancel := context.WithTimeout(context.Background(), timeout)
+		defer ctxCancel()
 
 		if errorCount > 5 {
 			debug.IfVerbose.Println("too many errors")
 			ws.Conn.Close(websocket.StatusAbnormalClosure, "close")
 			ws.Closed = true
-			continue
+		}
+		
+		if ws.Closed {
+			onLoseConnection()
+			break
 		}
 
-		_, message, err := ws.Conn.Read(ws.ctx)
+		_, message, err := ws.Conn.Read(ctx)
+		ctxCancel()
 
 		if err != nil {
 			debug.IfVerbose.Println("error reading ws event:", err)
