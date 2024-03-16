@@ -22,7 +22,25 @@ func main() {
 
 	fmt.Printf("Olá, %s\n", profile.Msg.UserName)
 
-	startTradingBinaries(userConnection)
+	topAssets, err := userConnection.GetTopAssets(wsapi.AssetTypeBinary)
+	if err != nil {
+		panic(err)
+	}
+
+	openAssets := topAssets.FilterOpen()
+
+	fmt.Println("open assets:")
+
+	for _, asset := range *openAssets {
+		assetName, err := data.Pairs.GetByID(asset.ActiveID)
+		if err != nil {
+			continue
+		}
+
+		fmt.Printf("%s: is open\n", assetName)
+	}
+
+	//startTradingBinaries(userConnection)
 
 	userConnection.WS.WaitGroup.Wait()
 }

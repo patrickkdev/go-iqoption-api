@@ -4,6 +4,16 @@ import "fmt"
 
 type pairs map[string]int
 
+func (c pairs) GetByID(id int) (string, error) {
+	for n, i := range c {
+		if i == id {
+			return n, nil
+		}
+	}
+
+	return "", fmt.Errorf("currency %d not found", id)
+}
+
 func (c pairs) GetByName(name string) (int, error) {
 	currency, ok := c[name]
 

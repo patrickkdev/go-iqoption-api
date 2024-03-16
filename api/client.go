@@ -169,6 +169,10 @@ func (bC *BrokerClient) GetCandles(count int, timeFrameInMinutes int, endtime in
 	return wsapi.GetCandles(bC.WS, count, timeFrameInMinutes, endtime, activeID, bC.getTimeout())
 }
 
+func (bC *BrokerClient) GetTopAssets(type_ wsapi.AssetType) (*wsapi.Assets, error) {
+	return wsapi.GetTopAssets(bC.WS, type_, bC.getTimeout())
+}
+
 func (bC *BrokerClient) OpenTrade(type_ wsapi.TradeType, amount float64, direction wsapi.TradeDirection, activeID int, timeFrameInMinutes int, balance wsapi.TradeBalance, waitForResult bool) (int, bool, error) {
 	balances, err := bC.GetBalances(false)
 	if err != nil {
