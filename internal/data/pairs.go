@@ -4,14 +4,14 @@ import "fmt"
 
 type pairs map[string]int
 
-func (c pairs) GetByID(id int) (string, error) {
+func (c pairs) GetByID(id int) (string) {
 	for n, i := range c {
 		if i == id {
-			return n, nil
+			return n
 		}
 	}
 
-	return "", fmt.Errorf("currency %d not found", id)
+	return ""
 }
 
 func (c pairs) GetByName(name string) (int, error) {

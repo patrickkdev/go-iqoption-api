@@ -1,11 +1,11 @@
-package wsapi
+package brokerws
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/patrickkdev/Go-IQOption-API/debug"
-	"github.com/patrickkdev/Go-IQOption-API/tjson"
+	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
+	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
 )
 
 type getCandlesResponse struct {

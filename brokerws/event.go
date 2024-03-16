@@ -1,11 +1,11 @@
-package wsapi
+package brokerws
 
 import (
 	"fmt"
 	"math/rand"
 	"time"
 
-	"github.com/patrickkdev/Go-IQOption-API/debug"
+	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
 )
 
 type RequestEvent struct {

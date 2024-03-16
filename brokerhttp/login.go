@@ -1,9 +1,9 @@
-package httpapi
+package brokerhttp
 
 import (
 	"encoding/json"
 
-	"github.com/patrickkdev/Go-IQOption-API/debug"
+	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
 )
 
 type LoginData struct {

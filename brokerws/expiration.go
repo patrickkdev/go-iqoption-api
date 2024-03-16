@@ -1,4 +1,4 @@
-package wsapi
+package brokerws
 
 import (
 	"time"

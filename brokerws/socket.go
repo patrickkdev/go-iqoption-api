@@ -1,4 +1,4 @@
-package wsapi
+package brokerws
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/patrickkdev/Go-IQOption-API/debug"
+	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
 
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"

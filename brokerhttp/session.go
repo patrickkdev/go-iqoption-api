@@ -1,4 +1,4 @@
-package httpapi
+package brokerhttp
 
 import (
 	"bytes"

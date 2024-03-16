@@ -1,9 +1,9 @@
-package wsapi
+package brokerws
 
 import (
 	"time"
 
-	"github.com/patrickkdev/Go-IQOption-API/tjson"
+	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
 )
 
 type AssetType string
@@ -46,7 +46,11 @@ type Assets []asset
 func (assets *Assets) FilterOpen() *Assets {
 	var openAssets Assets
 	for _, asset := range *assets {
-		if asset.Expiration > 0 && asset.Volume > 0 {
+		if 	asset.Expiration > 0 && 
+				asset.Volume > 0 && 
+				asset.SpotProfit > 0 &&
+				asset.Volatility > 0 &&
+				asset.ActiveID < 1000 {
 			openAssets = append(openAssets, asset)
 		}
 	}

@@ -1,10 +1,16 @@
-package wsapi
+package brokerws
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/patrickkdev/Go-IQOption-API/tjson"
+	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
+)
+
+type TradeBalance int
+
+const (
+	TradeBalanceDemo TradeBalance = 4
 )
 
 type balanceResponse struct {

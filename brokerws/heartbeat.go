@@ -1,7 +1,7 @@
-package wsapi
+package brokerws
 
 import (
-	"github.com/patrickkdev/Go-IQOption-API/debug"
+	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
 )
 
 type Heartbeat struct {

@@ -1,29 +1,25 @@
-package wsapi
+package brokerws
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/patrickkdev/Go-IQOption-API/debug"
-	"github.com/patrickkdev/Go-IQOption-API/tjson"
+	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
+	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
 )
 
 type TradeDirection string
-type TradeBalance int
-type TradeType string
 
 const (
 	TradeDirectionCall TradeDirection = "call"
 	TradeDirectionPut  TradeDirection = "put"
 )
 
-const (
-	TradeBalanceDemo TradeBalance = 4
-)
+type TradeShouldWaitForResult bool
 
 const (
-	TradeTypeDigital TradeType = "digital"
-	TradeTypeBinary  TradeType = "binary"
+	WaitForResult      TradeShouldWaitForResult = true
+	DoNotWaitForResult TradeShouldWaitForResult = false
 )
 
 type tradeDigitalResponseEvent struct {

@@ -1,9 +1,9 @@
-package wsapi
+package brokerws
 
 import (
 	"time"
 
-	"github.com/patrickkdev/Go-IQOption-API/tjson"
+	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
 )
 
 type CoreProfile struct {

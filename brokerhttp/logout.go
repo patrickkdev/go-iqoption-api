@@ -1,4 +1,4 @@
-package httpapi
+package brokerhttp
 
 func Logout(url string, session *Session) error {
 	resp, err := session.PostFromStruct(url, nil, nil)
