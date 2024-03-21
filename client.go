@@ -93,7 +93,6 @@ func (bC *Client) ConnectSocket() error {
 	if err != nil {
 		debug.IfVerbose.Println("Authentication error: ", err.Error())
 		bC.WS.Close()
-		bC.WS.WaitGroup.Done()
 		return err
 	}
 
