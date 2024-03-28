@@ -30,7 +30,7 @@ type result struct {
 	BalanceID             int64         `json:"balance_id"`
 	BalanceType           int64         `json:"balance_type"`
 	Balances              []interface{} `json:"balances"`
-	Birthdate             int64         `json:"birthdate"`
+	Birthdate             int64         `json:"-"`
 	BonusTotalWager       int64         `json:"bonus_total_wager"`
 	BonusWager            int64         `json:"bonus_wager"`
 	City                  string        `json:"city"`
