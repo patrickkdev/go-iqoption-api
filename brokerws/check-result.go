@@ -36,8 +36,8 @@ type BinaryResult struct {
 			Currency                         string  `json:"currency"`
 			Direction                        string  `json:"direction"`
 			Result                           string  `json:"result"`
-			Amount                           int     `json:"amount"`
-			EnrolledAmount                   int     `json:"enrolled_amount"`
+			Amount                           float64     `json:"amount"`
+			EnrolledAmount                   float64     `json:"enrolled_amount"`
 			ProfitAmount                     float64 `json:"profit_amount"`
 			WinEnrolledAmount                float64 `json:"win_enrolled_amount"`
 			Value                            float64 `json:"value"`
@@ -71,8 +71,8 @@ type BinaryResult struct {
 	Status              string  `json:"status"`
 	OpenTime            int     `json:"open_time"`
 	OpenQuote           float64 `json:"open_quote"`
-	Invest              int     `json:"invest"`
-	InvestEnrolled      int     `json:"invest_enrolled"`
+	Invest              float64     `json:"invest"`
+	InvestEnrolled      float64     `json:"invest_enrolled"`
 	CloseQuote          float64 `json:"close_quote"`
 	CloseReason         string  `json:"close_reason"`
 	CloseTime           int     `json:"close_time"`
@@ -101,10 +101,10 @@ type DigitalResult struct {
 			CreateAt   int     `json:"create_at"`
 			OrderIds   []int   `json:"order_ids"`
 			UpdateAt   int     `json:"update_at"`
-			BuyAmount  int     `json:"buy_amount"`
-			Commission int     `json:"commission"`
+			BuyAmount  float64     `json:"buy_amount"`
+			Commission float64     `json:"commission"`
 			ExtraData  struct {
-				Amount                int    `json:"amount"`
+				Amount                float64    `json:"amount"`
 				Version               string `json:"version"`
 				SpotOption            bool   `json:"spot_option"`
 				UseTrailStop          bool   `json:"use_trail_stop"`
@@ -119,7 +119,7 @@ type DigitalResult struct {
 			} `json:"extra_data"`
 			LastIndex                 int     `json:"last_index"`
 			TpslExtra                 any     `json:"tpsl_extra"`
-			SellAmount                int     `json:"sell_amount"`
+			SellAmount                float64     `json:"sell_amount"`
 			CloseReason               any     `json:"close_reason"`
 			PnlRealized               int     `json:"pnl_realized"`
 			BuyAvgPrice               float64 `json:"buy_avg_price"`
@@ -139,22 +139,22 @@ type DigitalResult struct {
 			UserBalanceType           int     `json:"user_balance_type"`
 			OpenQuoteTimeMs           int     `json:"open_quote_time_ms"`
 			StopLoseOrderID           any     `json:"stop_lose_order_id"`
-			BuyAmountEnrolled         int     `json:"buy_amount_enrolled"`
+			BuyAmountEnrolled         float64     `json:"buy_amount_enrolled"`
 			CloseEffectAmount         any     `json:"close_effect_amount"`
-			CommissionEnrolled        int     `json:"commission_enrolled"`
+			CommissionEnrolled        float64     `json:"commission_enrolled"`
 			InstrumentActiveID        int     `json:"instrument_active_id"`
 			InstrumentIDEscape        string  `json:"instrument_id_escape"`
-			SellAmountEnrolled        int     `json:"sell_amount_enrolled"`
+			SellAmountEnrolled        float64     `json:"sell_amount_enrolled"`
 			TakeProfitOrderID         any     `json:"take_profit_order_id"`
 			InstrumentExpiration      int     `json:"instrument_expiration"`
 			InstrumentUnderlying      string  `json:"instrument_underlying"`
 			OpenUnderlyingPrice       float64 `json:"open_underlying_price"`
-			PnlRealizedEnrolled       int     `json:"pnl_realized_enrolled"`
+			PnlRealizedEnrolled       float64     `json:"pnl_realized_enrolled"`
 			BuyAvgPriceEnrolled       float64 `json:"buy_avg_price_enrolled"`
 			CloseUnderlyingPrice      any     `json:"close_underlying_price"`
 			InstrumentStrikeValue     int     `json:"instrument_strike_value"`
 			OpenClientPlatformID      int     `json:"open_client_platform_id"`
-			SellAvgPriceEnrolled      int     `json:"sell_avg_price_enrolled"`
+			SellAvgPriceEnrolled      float64     `json:"sell_avg_price_enrolled"`
 			CloseEffectAmountEnrolled any     `json:"close_effect_amount_enrolled"`
 		} `json:"digital_options_position_changed1"`
 	} `json:"raw_event"`
@@ -171,12 +171,12 @@ type DigitalResult struct {
 	Status                 string  `json:"status"`
 	OpenTime               int     `json:"open_time"`
 	OpenQuote              float64 `json:"open_quote"`
-	Invest                 int     `json:"invest"`
-	InvestEnrolled         int     `json:"invest_enrolled"`
+	Invest                 float64     `json:"invest"`
+	InvestEnrolled         float64     `json:"invest_enrolled"`
 	SellProfit             float64 `json:"sell_profit"`
 	SellProfitEnrolled     float64 `json:"sell_profit_enrolled"`
-	ExpectedProfit         int     `json:"expected_profit"`
-	ExpectedProfitEnrolled int     `json:"expected_profit_enrolled"`
+	ExpectedProfit         float64     `json:"expected_profit"`
+	ExpectedProfitEnrolled float64     `json:"expected_profit_enrolled"`
 	Pnl                    float64 `json:"pnl"`
 	PnlNet                 float64 `json:"pnl_net"`
 	CurrentPrice           float64 `json:"current_price"`
