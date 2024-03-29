@@ -11,6 +11,7 @@ type TradeBalance int
 
 const (
 	TradeBalanceDemo TradeBalance = 4
+	TradeBalanceReal TradeBalance = 0
 )
 
 type balanceResponse struct {
