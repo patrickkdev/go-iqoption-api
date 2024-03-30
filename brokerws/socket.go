@@ -20,6 +20,7 @@ type Socket struct {
 	Conn          *websocket.Conn
 	Closed        bool
 	eventHandlers map[string]EventCallback
+	eventHandlersMutex sync.RWMutex
 	WaitGroup     *sync.WaitGroup
 }
 
@@ -77,11 +78,15 @@ func (ws *Socket) EmitEvent(event interface{}) {
 }
 
 func (ws *Socket) AddEventListener(name string, callback EventCallback) {
+	ws.eventHandlersMutex.Lock()
 	ws.eventHandlers[name] = callback
+	ws.eventHandlersMutex.Unlock()
 }
 
 func (ws *Socket) RemoveEventListener(name string) {
+	ws.eventHandlersMutex.Lock()
 	delete(ws.eventHandlers, name)
+	ws.eventHandlersMutex.Unlock()
 }
 
 func (ws *Socket) handleEvent(eventB []byte) {
@@ -102,7 +107,10 @@ func (ws *Socket) handleEvent(eventB []byte) {
 		return
 	}
 
+	ws.eventHandlersMutex.Lock()
 	callback, ok := ws.eventHandlers[event.Name]
+	ws.eventHandlersMutex.Unlock()
+	
 	if !ok {
 		reportEventError("no callback found for event: " + event.Name)
 		return
