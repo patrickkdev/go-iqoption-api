@@ -7,11 +7,11 @@ import (
 	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
 )
 
-type TradeBalance int
+type BalanceType int
 
 const (
-	TradeBalanceDemo TradeBalance = 4
-	TradeBalanceReal TradeBalance = 0
+	BalanceTypeReal BalanceType = 1
+	BalanceTypeDemo BalanceType = 4
 )
 
 type balanceResponse struct {
@@ -43,7 +43,7 @@ type Balance struct {
 
 type Balances []Balance
 
-func (b *Balances) FindByType(type_ TradeBalance) (*Balance, error) {
+func (b *Balances) FindByType(type_ BalanceType) (*Balance, error) {
 	for _, balance := range *b {
 		if balance.Type == int(type_) {
 			return &balance, nil
