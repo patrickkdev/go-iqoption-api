@@ -173,7 +173,7 @@ func (bC *Client) GetTopAssets(type_ brokerws.AssetType) (*brokerws.Assets, erro
 	return brokerws.GetTopAssets(bC.WS, type_, bC.getTimeout())
 }
 
-func (bC *Client) OpenTrade(type_ brokerws.AssetType, amount float64, direction brokerws.TradeDirection, activeID int, timeFrameInMinutes int, balance brokerws.TradeBalance, shouldWaitForResult brokerws.TradeShouldWaitForResult) (int, bool, error) {
+func (bC *Client) OpenTrade(type_ brokerws.AssetType, amount float64, direction brokerws.TradeDirection, activeID int, timeFrameInMinutes int, balance brokerws.BalanceType, shouldWaitForResult brokerws.TradeShouldWaitForResult) (int, bool, error) {
 	balances, err := bC.GetBalances(false)
 	if err != nil {
 		return 0, false, err
