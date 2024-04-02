@@ -43,14 +43,14 @@ type Balance struct {
 
 type Balances []Balance
 
-func (b *Balances) FindByType(type_ BalanceType) (*Balance, error) {
-	for _, balance := range *b {
+func (b *Balances) FindByType(type_ BalanceType) (Balance, error) {
+	for _, balance := range []Balance(*b) {
 		if balance.Type == int(type_) {
-			return &balance, nil
+			return balance, nil
 		}
 	}
 
-	return nil, fmt.Errorf("balance not found")
+	return Balance{}, fmt.Errorf("balance not found")
 }
 
 func GetBalances(ws *Socket, timeout time.Time) (*Balances, error) {
