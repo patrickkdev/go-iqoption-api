@@ -28,36 +28,43 @@ type Client struct {
 	eventHandlers map[string]brokerws.EventCallback
 }
 
-func NewClient(hostName string, timeoutForRequests time.Duration) *Client {
-	return &Client{
+func NewClient(loginData *brokerhttp.LoginData, hostName string, timeoutForRequests time.Duration, ssid ...string) *Client {
+	newClient := &Client{
+		LoginData:     loginData,
 		hostData:      data.GetHostData(hostName),
 		session:       brokerhttp.NewSession(),
 		timeSync:      brokerws.NewTimesync(),
 		eventHandlers: make(map[string]brokerws.EventCallback),
 		timeoutDFR:    timeoutForRequests,
 	}
-}
 
-func (bC *Client) Login(email string, password string, token *string) (*Client, error) {
-	data := &brokerhttp.LoginData{
-		Identifier: email,
-		Password:   password,
-		Token:      token,
+	if len(ssid) > 0 && ssid[0] != "" {
+		newClient.session.SSID = ssid[0]
 	}
 
-	err := brokerhttp.Login(bC.hostData.LoginURL, bC.session, data)
+	return newClient
+}
+
+func (bC *Client) Login() (*Client, error) {
+	err := brokerhttp.Login(bC.hostData.LoginURL, bC.session, bC.LoginData)
 
 	if err != nil {
 		return nil, err
 	}
-
-	bC.LoginData = data
 
 	return bC, nil
 }
 
 func (bC *Client) Logout() error {
 	return brokerhttp.Logout(bC.hostData.LogoutURL, bC.session)
+}
+
+func (bC *Client) GetSSID() string {
+	return bC.session.SSID
+}
+
+func (bC *Client) GetBrokerHost() string {
+	return bC.hostData.Host
 }
 
 func (bC *Client) ConnectSocket() error {
