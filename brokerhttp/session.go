@@ -12,8 +12,14 @@ type Session struct {
 	ClientSessionID string 	`json:"client_session_id"`
 }
 
-func NewSession() *Session {
-	return &Session{}
+func NewSession(ssid ...string) *Session {
+	newSession := &Session{}
+	
+	if len(ssid) > 0 {
+		newSession.SSID = ssid[0]
+	}
+
+	return newSession
 }
 
 func (sD *Session) PostFromStruct(url string, data interface{}, customHeaders map[string]string) (*http.Response, error) {
