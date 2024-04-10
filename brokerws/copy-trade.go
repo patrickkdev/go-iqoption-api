@@ -7,30 +7,29 @@ import (
 )
 
 type TradeData struct {
-	type_              AssetType
-	activeID           int
-	timeFrameInMinutes int
-	amount             float64
-	direction          TradeDirection
+	Type              AssetType
+	Direction          TradeDirection
+	TimeFrameInMinutes int
+	ActiveID           int
+	Amount             float64
 }
 
 func OnOpenTrade(ws *Socket, callback func(tradeData TradeData)) {
 	ws.AddEventListener("position-changed", func(event []byte) {
 		eventString := string(event)
 
-		tradeData := TradeData{activeID: 0}
-
+		tradeData := TradeData{ActiveID: 0}
 		if strings.Contains(eventString, "binary_options_option_changed1") {
 			res, err := tjson.Unmarshal[binaryTradeData](event)
 			if err != nil || res.Msg.Status != "open" {
 				return
 			}
 
-			tradeData.type_ =              AssetTypeBinary
-			tradeData.activeID =           res.Msg.ActiveID
-			tradeData.timeFrameInMinutes = (res.Msg.RawEvent.BinaryOptionsOptionChanged1.ExpirationTime - res.Msg.RawEvent.BinaryOptionsOptionChanged1.OpenTime) / 60
-			tradeData.amount =             res.Msg.RawEvent.BinaryOptionsOptionChanged1.Amount
-			tradeData.direction =          TradeDirection(res.Msg.RawEvent.BinaryOptionsOptionChanged1.Direction)
+			tradeData.Type =              AssetTypeBinary
+			tradeData.ActiveID =           res.Msg.ActiveID
+			tradeData.TimeFrameInMinutes = (res.Msg.RawEvent.BinaryOptionsOptionChanged1.ExpirationTime - res.Msg.RawEvent.BinaryOptionsOptionChanged1.OpenTime) / 60
+			tradeData.Amount =             res.Msg.RawEvent.BinaryOptionsOptionChanged1.Amount
+			tradeData.Direction =          TradeDirection(res.Msg.RawEvent.BinaryOptionsOptionChanged1.Direction)
 			
 		} else if strings.Contains(eventString, "digital_options_position_changed1") {
 			res, err := tjson.Unmarshal[digitalTradeData](event)
@@ -38,14 +37,14 @@ func OnOpenTrade(ws *Socket, callback func(tradeData TradeData)) {
 				return
 			}
 
-			tradeData.type_ =              AssetTypeDigital
-			tradeData.activeID =           res.Msg.ActiveID
-			tradeData.timeFrameInMinutes = res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentPeriod / 60
-			tradeData.amount =             res.Msg.RawEvent.DigitalOptionsPositionChanged1.BuyAmount
-			tradeData.direction =          TradeDirection(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentDir)
+			tradeData.Type =              AssetTypeDigital
+			tradeData.ActiveID =           res.Msg.ActiveID
+			tradeData.TimeFrameInMinutes = res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentPeriod / 60
+			tradeData.Amount =             res.Msg.RawEvent.DigitalOptionsPositionChanged1.BuyAmount
+			tradeData.Direction =          TradeDirection(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentDir)
 		}
 
-		if tradeData.activeID == 0 {
+		if tradeData.ActiveID == 0 {
 			return
 		}
 
