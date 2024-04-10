@@ -8,13 +8,13 @@ import (
 	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
 )
 
-type binaryCheckResultResponse struct {
+type binaryTradeData struct {
 	Name             string       `json:"name"`
 	MicroserviceName string       `json:"microserviceName"`
 	Msg              BinaryResult `json:"msg"`
 }
 
-type digitalCheckResultResponse struct {
+type digitalTradeData struct {
 	Name             string        `json:"name"`
 	MicroserviceName string        `json:"microserviceName"`
 	Msg              DigitalResult `json:"msg"`
@@ -188,10 +188,10 @@ func CheckResultBinary(ws *Socket, tradeID int, timeout time.Time) (*BinaryResul
 	debug.IfVerbose.Printf("Calling check result binary with tradeID: %d\n", tradeID)
 
 	var err error = nil
-	var res binaryCheckResultResponse
+	var res binaryTradeData
 
 	ws.AddEventListener("position-changed", func(event []byte) {
-		res, err = tjson.Unmarshal[binaryCheckResultResponse](event)
+		res, err = tjson.Unmarshal[binaryTradeData](event)
 
 		debug.IfVerbose.Println("Position changed for binary trade")
 		debug.IfVerbose.PrintAsJSON(res)
@@ -229,10 +229,10 @@ func CheckResultDigital(ws *Socket, tradeID int, timeout time.Time) (*DigitalRes
 	debug.IfVerbose.Printf("Calling check result digital with tradeID: %d\n", tradeID)
 
 	var err error = nil
-	var res digitalCheckResultResponse
+	var res digitalTradeData
 
 	ws.AddEventListener("position-changed", func(event []byte) {
-		res, err = tjson.Unmarshal[digitalCheckResultResponse](event)
+		res, err = tjson.Unmarshal[digitalTradeData](event)
 
 		debug.IfVerbose.Println("Position changed for digital trade")
 		debug.IfVerbose.PrintAsJSON(res)

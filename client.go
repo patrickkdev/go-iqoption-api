@@ -26,6 +26,9 @@ type Client struct {
 	timeoutDFR time.Duration
 
 	eventHandlers map[string]brokerws.EventCallback
+
+	// On open trade
+	onOpenTrade func(tradeData brokerws.TradeData)
 }
 
 func NewClient(loginData *brokerhttp.LoginData, hostName string, timeoutForRequests time.Duration, ssid ...string) *Client {
@@ -112,6 +115,9 @@ func (bC *Client) ConnectSocket() error {
 
 	fmt.Println("Authenticated successfully")
 
+	// Setup OnOpenTrade
+	brokerws.OnOpenTrade(bC.WS, bC.onOpenTrade)
+
 	// Handle heartbeat
 	bC.WS.AddEventListener("heartbeat", func(event []byte) {
 		var heartbeatFromServer brokerws.Heartbeat
@@ -131,6 +137,10 @@ func (bC *Client) ConnectSocket() error {
 	bC.GetBalances(true)
 
 	return nil
+}
+
+func (bC *Client) AddOpenTradeListener(onOpenTrade func(tradeData brokerws.TradeData)) {
+	bC.onOpenTrade = onOpenTrade
 }
 
 func (bC *Client) GetCoreProfile() (*brokerws.CoreProfile, error) {
