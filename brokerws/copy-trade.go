@@ -27,7 +27,7 @@ func OnOpenTrade(ws *Socket, callback func(tradeData TradeData)) {
 
 			tradeData.Type =              AssetTypeBinary
 			tradeData.ActiveID =           res.Msg.ActiveID
-			tradeData.TimeFrameInMinutes = (res.Msg.RawEvent.BinaryOptionsOptionChanged1.ExpirationTime - res.Msg.RawEvent.BinaryOptionsOptionChanged1.OpenTime) / 60
+			tradeData.TimeFrameInMinutes = max((res.Msg.RawEvent.BinaryOptionsOptionChanged1.ExpirationTime - res.Msg.RawEvent.BinaryOptionsOptionChanged1.OpenTime) / 60, 1)
 			tradeData.Amount =             res.Msg.RawEvent.BinaryOptionsOptionChanged1.Amount
 			tradeData.Direction =          TradeDirection(res.Msg.RawEvent.BinaryOptionsOptionChanged1.Direction)
 			
@@ -39,7 +39,7 @@ func OnOpenTrade(ws *Socket, callback func(tradeData TradeData)) {
 
 			tradeData.Type =              AssetTypeDigital
 			tradeData.ActiveID =           res.Msg.ActiveID
-			tradeData.TimeFrameInMinutes = res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentPeriod / 60
+			tradeData.TimeFrameInMinutes = max(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentPeriod / 60, 1)
 			tradeData.Amount =             res.Msg.RawEvent.DigitalOptionsPositionChanged1.BuyAmount
 			tradeData.Direction =          TradeDirection(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentDir)
 		}
