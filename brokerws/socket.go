@@ -44,8 +44,9 @@ func NewSocketConnection(url string, onLoseConnection func()) (*Socket, error) {
 	}
 
 	if conn == nil {
-		debug.IfVerbose.Println("conn is nil")
-		return nil, fmt.Errorf("conn is nil")
+		err = fmt.Errorf("conn is nil")
+		debug.IfVerbose.Println(err.Error())
+		return nil, err
 	}
 
 	conn.SetReadLimit(-1)

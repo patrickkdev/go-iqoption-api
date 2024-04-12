@@ -85,9 +85,9 @@ func (bC *Client) ConnectSocket() error {
 
 	socketConnection, err := brokerws.NewSocketConnection(bC.hostData.WSAPIURL, reconnect)
 	defer func () {
-		if err != nil {
-			debug.IfVerbose.Println("Authentication error: ", err.Error())
+		debug.IfVerbose.Printf("ConnectSocket defer called with error: %v\n", err)
 
+		if err != nil {
 			if socketConnection != nil && !socketConnection.Closed {
 				socketConnection.Close()
 			}
@@ -102,7 +102,7 @@ func (bC *Client) ConnectSocket() error {
 	
 	// Handle authentication
 	resp, err := brokerws.Authenticate(
-		bC.WS,
+		socketConnection,
 		bC.session.SSID,
 		bC.getTimeout(),
 	)
@@ -114,10 +114,11 @@ func (bC *Client) ConnectSocket() error {
 	if !resp.Msg {
 		err = fmt.Errorf("authentication error")
 		debug.IfVerbose.PrintAsJSON(resp)
+		return err
 	}
 
-	if err != nil {
-		return err
+	if socketConnection == nil {
+		return fmt.Errorf("socket connection is nil")
 	}
 	
 	bC.WS = socketConnection
