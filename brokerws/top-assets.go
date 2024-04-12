@@ -43,19 +43,30 @@ type asset struct {
 
 type Assets []asset
 
-func (assets *Assets) FilterOpen() *Assets {
-	var openAssets Assets
-	for _, asset := range *assets {
-		if 	asset.Expiration > 0 && 
+func (assets *Assets) FilterOpen() {
+	var oldAssets Assets = *assets
+	var newAssets Assets = Assets{}
+
+	for _, asset := range oldAssets {
+		if	asset.Expiration > 0 && 
 				asset.Volume > 0 && 
 				asset.SpotProfit > 0 &&
-				asset.Volatility > 0 &&
-				asset.ActiveID < 1000 {
-			openAssets = append(openAssets, asset)
+				asset.Volatility > 0 {
+			newAssets = append(newAssets, asset)
 		}
 	}
 
-	return &openAssets
+	*assets = newAssets
+}
+
+func (assets *Assets) RemoveByID(id int) {
+	for i, asset := range *assets {
+		if asset.ActiveID == id {
+			(*assets)[i] = (*assets)[len(*assets)-1]
+			*assets = (*assets)[:len(*assets)-1]
+			break
+		}
+	}
 }
 
 func GetTopAssets(ws *Socket, type_ AssetType, timeout time.Time) (*Assets, error) {

@@ -25,7 +25,7 @@ type Client struct {
 	// Timeout duration for requests
 	timeoutDFR time.Duration
 
-	eventHandlers map[string]brokerws.EventCallback
+	openTradeCallback func(tradeData brokerws.TradeData)
 }
 
 func NewClient(loginData *brokerhttp.LoginData, hostName string, timeoutForRequests time.Duration, ssid ...string) *Client {
@@ -34,7 +34,6 @@ func NewClient(loginData *brokerhttp.LoginData, hostName string, timeoutForReque
 		hostData:      data.GetHostData(hostName),
 		session:       brokerhttp.NewSession(),
 		timeSync:      brokerws.NewTimesync(),
-		eventHandlers: make(map[string]brokerws.EventCallback),
 		timeoutDFR:    timeoutForRequests,
 	}
 
@@ -77,6 +76,7 @@ func (bC *Client) ConnectSocket() error {
 				time.Sleep(time.Second)
 				continue
 			}
+
 			break
 		}
 
@@ -84,12 +84,22 @@ func (bC *Client) ConnectSocket() error {
 	}
 
 	socketConnection, err := brokerws.NewSocketConnection(bC.hostData.WSAPIURL, reconnect)
+	defer func () {
+		if err != nil {
+			debug.IfVerbose.Println("Authentication error: ", err.Error())
+
+			if socketConnection != nil && !socketConnection.Closed {
+				socketConnection.Close()
+			}
+			
+			socketConnection = nil
+		}
+	}()
+
 	if err != nil {
 		return err
 	}
-
-	bC.WS = socketConnection
-
+	
 	// Handle authentication
 	resp, err := brokerws.Authenticate(
 		bC.WS,
@@ -98,21 +108,24 @@ func (bC *Client) ConnectSocket() error {
 	)
 
 	if err != nil {
-		debug.IfVerbose.Println("Authentication error: ", err.Error())
-		bC.WS.Close()
 		return err
 	}
-
+	
 	if !resp.Msg {
-		error_ := fmt.Errorf("authentication error")
-		debug.IfVerbose.Println(error_)
+		err = fmt.Errorf("authentication error")
 		debug.IfVerbose.PrintAsJSON(resp)
-		return error_
 	}
 
-	fmt.Println("Authenticated successfully")
+	if err != nil {
+		return err
+	}
+	
+	bC.WS = socketConnection
+	debug.IfVerbose.Println("Authenticated successfully")
 
-	// Handle heartbeat
+	// region Handle Events
+
+	// Heartbeat
 	bC.WS.AddEventListener("heartbeat", func(event []byte) {
 		var heartbeatFromServer brokerws.Heartbeat
 		json.Unmarshal(event, &heartbeatFromServer)
@@ -120,7 +133,7 @@ func (bC *Client) ConnectSocket() error {
 		brokerws.AnswerHeartbeat(bC.WS, heartbeatFromServer, bC.timeSync.GetServerTimestamp())
 	})
 
-	// Handle timesync
+	// Timesync
 	bC.WS.AddEventListener("timeSync", func(event []byte) {
 		var timesyncEvent brokerws.TimesyncEvent
 		json.Unmarshal(event, &timesyncEvent)
@@ -128,13 +141,25 @@ func (bC *Client) ConnectSocket() error {
 		bC.timeSync.SetServerTimestamp(timesyncEvent.Msg)
 	})
 
-	bC.GetBalances(true)
+	// Open Trade
+	if bC.openTradeCallback != nil {
+		bC.RemoveOpenTradeListener()
+		bC.SetOpenTradeListener(bC.openTradeCallback)
+	}
 
+	// Get updated balances
+	bC.GetBalances(true)
 	return nil
 }
 
-func (bC *Client) AddOpenTradeListener(onOpenTrade func(tradeData brokerws.TradeData)) {
-	brokerws.OnOpenTrade(bC.WS, onOpenTrade)
+func (bC *Client) SetOpenTradeListener(onOpenTrade func(tradeData brokerws.TradeData)) {
+	bC.openTradeCallback = onOpenTrade
+	brokerws.SetOpenTradeListener(bC.WS, onOpenTrade)
+}
+
+func (bC *Client) RemoveOpenTradeListener() {
+	bC.openTradeCallback = nil
+	brokerws.RemoveOpenTradeListener(bC.WS)
 }
 
 func (bC *Client) GetCoreProfile() (*brokerws.CoreProfile, error) {
