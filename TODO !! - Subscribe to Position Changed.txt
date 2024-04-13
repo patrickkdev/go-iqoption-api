@@ -1,3 +1,9 @@
+Implement persistent subscription to position changed event. 
+That will help keeping track to the current balance without having to call .GetBalance()
+
+Remember to subscribe in the ConnectSocket function so that it always subscribes again if connection gets lost
+
+// Subscription Request
 {
   "name": "subscribeMessage",
   "request_id": "s_150",
@@ -8,6 +14,7 @@
   }
 }
 
+// Event when balance changes
 {
   "name": "balance-changed",
   "microserviceName": "internal-billing",
