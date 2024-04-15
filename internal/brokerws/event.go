@@ -5,16 +5,11 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/patrickkdev/Go-IQOption-API/btypes"
 	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
 )
 
-type RequestEvent struct {
-	Name      string      `json:"name"`
-	Msg       interface{} `json:"msg"`
-	RequestId string      `json:"request_id"`
-}
-
-func EmitWithResponse(ws *Socket, event *RequestEvent, responseEventName string, timeout time.Time) (resp []byte, err error) {
+func (ws *Socket) EmitWithResponse(event *btypes.RequestEvent, responseEventName string, timeout time.Time) (resp []byte, err error) {
 	event.RequestId = fmt.Sprint(rand.Int63n(10000000000))
 
 	ws.EmitEvent(event)
@@ -44,7 +39,6 @@ func EmitWithResponse(ws *Socket, event *RequestEvent, responseEventName string,
 	}
 
 	ws.RemoveEventListener(responseEventName)
-	debug.IfVerbose.PrintAsJSON(resp)
 
 	if err != nil {
 		return nil, err
@@ -53,7 +47,7 @@ func EmitWithResponse(ws *Socket, event *RequestEvent, responseEventName string,
 	return resp, nil
 }
 
-func Emit(ws *Socket, event *RequestEvent) {
+func (ws *Socket) Emit(event *btypes.RequestEvent) {
 	event.RequestId = fmt.Sprint(rand.Int63n(10000000000))
 
 	ws.EmitEvent(event)

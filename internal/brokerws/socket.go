@@ -17,11 +17,11 @@ import (
 type EventCallback func(event []byte)
 
 type Socket struct {
-	Conn          *websocket.Conn
-	Closed        bool
-	eventHandlers map[string]EventCallback
+	Conn               *websocket.Conn
+	Closed             bool
+	eventHandlers      map[string]EventCallback
 	eventHandlersMutex sync.RWMutex
-	WaitGroup     *sync.WaitGroup
+	WaitGroup          *sync.WaitGroup
 }
 
 const timeout = time.Second * 15
@@ -93,7 +93,6 @@ func (ws *Socket) RemoveEventListener(name string) {
 func (ws *Socket) handleEvent(eventB []byte) {
 	reportEventError := func(errMessage string) {
 		debug.IfVerbose.Println(errMessage)
-		debug.IfVerbose.PrintAsJSON(eventB)
 	}
 
 	event := new(struct {
@@ -111,7 +110,7 @@ func (ws *Socket) handleEvent(eventB []byte) {
 	ws.eventHandlersMutex.Lock()
 	callback, ok := ws.eventHandlers[event.Name]
 	ws.eventHandlersMutex.Unlock()
-	
+
 	if !ok {
 		reportEventError("no callback found for event: " + event.Name)
 		return

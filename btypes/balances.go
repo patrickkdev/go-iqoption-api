@@ -1,11 +1,6 @@
-package brokerws
+package btypes
 
-import (
-	"fmt"
-	"time"
-
-	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
-)
+import "fmt"
 
 type BalanceType int
 
@@ -13,13 +8,6 @@ const (
 	BalanceTypeReal BalanceType = 1
 	BalanceTypeDemo BalanceType = 4
 )
-
-type balanceResponse struct {
-	RequestID string   `json:"request_id"`
-	Name      string   `json:"name"`
-	Msg       Balances `json:"msg"`
-	Status    int64    `json:"status"`
-}
 
 type Balance struct {
 	ID                int         `json:"id"`
@@ -53,27 +41,30 @@ func (b *Balances) FindByType(type_ BalanceType) (Balance, error) {
 	return Balance{}, fmt.Errorf("balance not found")
 }
 
-func GetBalances(ws *Socket, timeout time.Time) (*Balances, error) {
-	eventMsg := map[string]interface{}{
-		"name":    "get-balances",
-		"body":    map[string]interface{}{},
-		"version": "1.0",
+func (b *Balances) Update(update BalanceUpdate) {
+	for i, balance := range *b {
+		if balance.ID == update.ID {
+			(*b)[i].Amount = update.NewAmount
+			(*b)[i].EnrolledAmount = update.EnrolledAmount
+			(*b)[i].BonusAmount = update.BonusAmount
+			(*b)[i].IsFiat = update.IsFiat
+			(*b)[i].IsMarginal = update.IsMarginal
+			return
+		}
 	}
+}
 
-	requestEvent := &RequestEvent{
-		Name: "sendMessage",
-		Msg:  eventMsg,
-	}
-
-	resp, err := EmitWithResponse(ws, requestEvent, "balances", timeout)
-	if err != nil {
-		return nil, err
-	}
-
-	responseEvent, err := tjson.Unmarshal[balanceResponse](resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return &responseEvent.Msg, nil
+type BalanceUpdate struct {
+	ID                  int     `json:"id"`
+	Amount              float64 `json:"amount"`
+	EnrolledAmount      float64 `json:"enrolled_amount"`
+	BonusAmount         int     `json:"bonus_amount"`
+	BonusEnrolledAmount int     `json:"bonus_enrolled_amount"`
+	Currency            string  `json:"currency"`
+	Type                int     `json:"type"`
+	Index               int64   `json:"index"`
+	IsFiat              bool    `json:"is_fiat"`
+	NewAmount           float64 `json:"new_amount"`
+	BonusTotalAmount    int     `json:"bonus_total_amount"`
+	IsMarginal          bool    `json:"is_marginal"`
 }

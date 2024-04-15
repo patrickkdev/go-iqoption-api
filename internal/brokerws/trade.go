@@ -4,22 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/patrickkdev/Go-IQOption-API/btypes"
 	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
 	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
-)
-
-type TradeDirection string
-
-const (
-	TradeDirectionCall TradeDirection = "call"
-	TradeDirectionPut  TradeDirection = "put"
-)
-
-type TradeShouldWaitForResult bool
-
-const (
-	WaitForResult      TradeShouldWaitForResult = true
-	DoNotWaitForResult TradeShouldWaitForResult = false
 )
 
 type tradeDigitalResponseEvent struct {
@@ -56,10 +43,10 @@ type tradeBinaryResponseEvent struct {
 	Status int64 `json:"status"`
 }
 
-func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64, timeout time.Time) (tradeID int, err error) {
+func (ws *Socket) TradeDigital(amount float64, direction btypes.TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64, timeout time.Time) (tradeID int, err error) {
 	exp, _ := GetExpirationTime(serverTimeStamp, duration)
 
-	instrument, err := GetInstrument(ws, activeID, exp, timeout)
+	instrument, err := ws.GetInstrument(activeID, exp, timeout)
 	if err != nil {
 		return 0, err
 	}
@@ -81,7 +68,7 @@ func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID
 		},
 	}
 
-	requestEvent := &RequestEvent{
+	requestEvent := &btypes.RequestEvent{
 		Name: "sendMessage",
 		Msg:  eventMsg,
 	}
@@ -89,7 +76,7 @@ func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID
 	debug.IfVerbose.Println("requestEvent:")
 	debug.IfVerbose.PrintAsJSON(requestEvent)
 
-	resp, err := EmitWithResponse(ws, requestEvent, "digital-option-placed", timeout)
+	resp, err := ws.EmitWithResponse(requestEvent, "digital-option-placed", timeout)
 	if err != nil {
 		return 0, err
 	}
@@ -109,7 +96,7 @@ func TradeDigital(ws *Socket, amount float64, direction TradeDirection, activeID
 	return responseEvent.Msg.ID, nil
 }
 
-func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64, timeout time.Time) (tradeID int, err error) {
+func (ws *Socket) TradeBinary(amount float64, direction btypes.TradeDirection, activeID int, duration int, targetBalanceID int, serverTimeStamp int64, timeout time.Time) (tradeID int, err error) {
 	exp, idx := GetExpirationTime(serverTimeStamp, duration)
 	debug.IfVerbose.Println("expiration time: ", idx)
 
@@ -131,7 +118,7 @@ func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID 
 		},
 	}
 
-	requestEvent := &RequestEvent{
+	requestEvent := &btypes.RequestEvent{
 		Name: "sendMessage",
 		Msg:  eventMsg,
 	}
@@ -139,7 +126,7 @@ func TradeBinary(ws *Socket, amount float64, direction TradeDirection, activeID 
 	debug.IfVerbose.Println("requestEvent:")
 	debug.IfVerbose.PrintAsJSON(requestEvent)
 
-	resp, err := EmitWithResponse(ws, requestEvent, "option", timeout)
+	resp, err := ws.EmitWithResponse(requestEvent, "option", timeout)
 	if err != nil {
 		return 0, err
 	}

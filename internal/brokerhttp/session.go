@@ -7,13 +7,14 @@ import (
 )
 
 type Session struct {
-	Code   					string  `json:"code"`
-	SSID  					string  `json:"ssid"`
-	ClientSessionID string 	`json:"client_session_id"`
+	Code            string    `json:"code"`
+	SSID            string    `json:"ssid"`
+	ClientSessionID string    `json:"client_session_id"`
+	LoginData       LoginData `json:"login_data,omitempty"`
 }
 
-func NewSession() *Session {
-	return &Session{}
+func NewSession(loginData LoginData) Session {
+	return Session{LoginData: loginData}
 }
 
 func (sD *Session) PostFromStruct(url string, data interface{}, customHeaders map[string]string) (*http.Response, error) {

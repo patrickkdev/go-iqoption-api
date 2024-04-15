@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/patrickkdev/Go-IQOption-API/btypes"
 	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
 )
 
@@ -33,12 +34,12 @@ type instrument struct {
 }
 
 type instrumentData []struct {
-	Strike    string         `json:"strike"`
-	Symbol    string         `json:"symbol"`
-	Direction TradeDirection `json:"direction"`
+	Strike    string                `json:"strike"`
+	Symbol    string                `json:"symbol"`
+	Direction btypes.TradeDirection `json:"direction"`
 }
 
-func (data instrumentData) GetSymbol(direction TradeDirection) (symbol string, err error) {
+func (data instrumentData) GetSymbol(direction btypes.TradeDirection) (symbol string, err error) {
 	for _, v := range data {
 		if v.Strike == "SPT" && v.Direction == direction {
 			return v.Symbol, nil
@@ -48,7 +49,7 @@ func (data instrumentData) GetSymbol(direction TradeDirection) (symbol string, e
 	return "", fmt.Errorf("no symbol found for direction %s", direction)
 }
 
-func GetInstrument(ws *Socket, activeID int, exp int, timeout time.Time) (*instrument, error) {
+func (ws *Socket) GetInstrument(activeID int, exp int, timeout time.Time) (*instrument, error) {
 	msg := map[string]interface{}{
 		"name":    "digital-option-instruments.get-instruments",
 		"version": "2.0",
@@ -58,12 +59,12 @@ func GetInstrument(ws *Socket, activeID int, exp int, timeout time.Time) (*instr
 		},
 	}
 
-	requestEvent := &RequestEvent{
+	requestEvent := &btypes.RequestEvent{
 		Name: "sendMessage",
 		Msg:  msg,
 	}
 
-	resp, err := EmitWithResponse(ws, requestEvent, "instruments", timeout)
+	resp, err := ws.EmitWithResponse(requestEvent, "instruments", timeout)
 	if err != nil {
 		return nil, err
 	}

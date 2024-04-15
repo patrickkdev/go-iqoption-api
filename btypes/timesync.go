@@ -1,4 +1,4 @@
-package brokerws
+package btypes
 
 import (
 	"time"
@@ -14,40 +14,32 @@ type TimesyncEvent struct {
 
 type Timesync struct {
 	Name            string
-	serverTimestamp int64
-	expirationTime  int
-}
-
-func NewTimesync() *Timesync {
-	return &Timesync{
-		Name:            "timeSync",
-		serverTimestamp: time.Now().UnixNano(),
-		expirationTime:  1,
-	}
+	ServerTimestamp int64
+	ExpirationTime  int
 }
 
 func (t *Timesync) GetServerTimestamp() int64 {
-	return t.serverTimestamp / 1000
+	return t.ServerTimestamp / 1000
 }
 
 func (t *Timesync) GetServerDatetime() time.Time {
-	return time.Unix(int64(t.serverTimestamp), 0)
+	return time.Unix(int64(t.ServerTimestamp), 0)
 }
 
 func (t *Timesync) SetServerTimestamp(timestamp int64) {
-	t.serverTimestamp = timestamp
+	t.ServerTimestamp = timestamp
 }
 
 func (t *Timesync) GetExpirationTime() int {
-	return t.expirationTime
+	return t.ExpirationTime
 }
 
 func (t *Timesync) GetExpirationDatetime() time.Time {
-	return time.Now().Add(time.Minute * time.Duration(t.expirationTime))
+	return time.Now().Add(time.Minute * time.Duration(t.ExpirationTime))
 }
 
 func (t *Timesync) SetExpirationTime(timeInMinutes int) {
-	t.expirationTime = timeInMinutes
+	t.ExpirationTime = timeInMinutes
 }
 
 func (t *Timesync) ExpirationTimestamp() float64 {

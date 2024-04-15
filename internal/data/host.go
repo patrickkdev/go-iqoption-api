@@ -10,7 +10,7 @@ type Host struct {
 	WSAPIURL   string
 }
 
-func GetHostData(hostName string) *Host {
+func GetHostData(hostName string) Host {
 	urls := Host{
 		Host:       hostName,
 		LoginURL:   fmt.Sprintf("https://auth.%s/api/v2/login", hostName),
@@ -19,5 +19,5 @@ func GetHostData(hostName string) *Host {
 		WSAPIURL:   fmt.Sprintf("wss://%s/echo/websocket", hostName),
 	}
 
-	return &urls
+	return urls
 }

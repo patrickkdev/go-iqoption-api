@@ -1,23 +1,16 @@
-package brokerws
+package btypes
 
-import (
-	"fmt"
-	"time"
-
-	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
-	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
-)
-
-type binaryTradeData struct {
-	Name             string       `json:"name"`
-	MicroserviceName string       `json:"microserviceName"`
-	Msg              BinaryResult `json:"msg"`
-}
-
-type digitalTradeData struct {
-	Name             string        `json:"name"`
-	MicroserviceName string        `json:"microserviceName"`
-	Msg              DigitalResult `json:"msg"`
+type TradeData struct {
+	Status             string
+	TradeID            int
+	Type               AssetType
+	Direction          TradeDirection
+	TimeFrameInMinutes int
+	ActiveID           int
+	Amount             float64
+	Win                bool
+	OpenTime           int
+	Profit             float64
 }
 
 type BinaryResult struct {
@@ -36,8 +29,8 @@ type BinaryResult struct {
 			Currency                         string  `json:"currency"`
 			Direction                        string  `json:"direction"`
 			Result                           string  `json:"result"`
-			Amount                           float64     `json:"amount"`
-			EnrolledAmount                   float64     `json:"enrolled_amount"`
+			Amount                           float64 `json:"amount"`
+			EnrolledAmount                   float64 `json:"enrolled_amount"`
 			ProfitAmount                     float64 `json:"profit_amount"`
 			WinEnrolledAmount                float64 `json:"win_enrolled_amount"`
 			Value                            float64 `json:"value"`
@@ -71,8 +64,8 @@ type BinaryResult struct {
 	Status              string  `json:"status"`
 	OpenTime            int     `json:"open_time"`
 	OpenQuote           float64 `json:"open_quote"`
-	Invest              float64     `json:"invest"`
-	InvestEnrolled      float64     `json:"invest_enrolled"`
+	Invest              float64 `json:"invest"`
+	InvestEnrolled      float64 `json:"invest_enrolled"`
 	CloseQuote          float64 `json:"close_quote"`
 	CloseReason         string  `json:"close_reason"`
 	CloseTime           int     `json:"close_time"`
@@ -101,25 +94,25 @@ type DigitalResult struct {
 			CreateAt   int     `json:"create_at"`
 			OrderIds   []int   `json:"order_ids"`
 			UpdateAt   int     `json:"update_at"`
-			BuyAmount  float64     `json:"buy_amount"`
-			Commission float64     `json:"commission"`
+			BuyAmount  float64 `json:"buy_amount"`
+			Commission float64 `json:"commission"`
 			ExtraData  struct {
-				Amount                float64    `json:"amount"`
-				Version               string `json:"version"`
-				SpotOption            bool   `json:"spot_option"`
-				UseTrailStop          bool   `json:"use_trail_stop"`
-				AutoMarginCall        bool   `json:"auto_margin_call"`
-				LastChangeReason      string `json:"last_change_reason"`
-				OpenReceivedTime      int    `json:"open_received_time"`
-				LowerInstrumentID     string `json:"lower_instrument_id"`
-				UpperInstrumentID     string `json:"upper_instrument_id"`
-				LowerInstrumentStrike int    `json:"lower_instrument_strike"`
-				UpperInstrumentStrike int    `json:"upper_instrument_strike"`
-				UseTokenForCommission bool   `json:"use_token_for_commission"`
+				Amount                float64 `json:"amount"`
+				Version               string  `json:"version"`
+				SpotOption            bool    `json:"spot_option"`
+				UseTrailStop          bool    `json:"use_trail_stop"`
+				AutoMarginCall        bool    `json:"auto_margin_call"`
+				LastChangeReason      string  `json:"last_change_reason"`
+				OpenReceivedTime      int     `json:"open_received_time"`
+				LowerInstrumentID     string  `json:"lower_instrument_id"`
+				UpperInstrumentID     string  `json:"upper_instrument_id"`
+				LowerInstrumentStrike int     `json:"lower_instrument_strike"`
+				UpperInstrumentStrike int     `json:"upper_instrument_strike"`
+				UseTokenForCommission bool    `json:"use_token_for_commission"`
 			} `json:"extra_data"`
 			LastIndex                 int     `json:"last_index"`
 			TpslExtra                 any     `json:"tpsl_extra"`
-			SellAmount                float64     `json:"sell_amount"`
+			SellAmount                float64 `json:"sell_amount"`
 			CloseReason               any     `json:"close_reason"`
 			PnlRealized               int     `json:"pnl_realized"`
 			BuyAvgPrice               float64 `json:"buy_avg_price"`
@@ -139,22 +132,22 @@ type DigitalResult struct {
 			UserBalanceType           int     `json:"user_balance_type"`
 			OpenQuoteTimeMs           int     `json:"open_quote_time_ms"`
 			StopLoseOrderID           any     `json:"stop_lose_order_id"`
-			BuyAmountEnrolled         float64     `json:"buy_amount_enrolled"`
+			BuyAmountEnrolled         float64 `json:"buy_amount_enrolled"`
 			CloseEffectAmount         any     `json:"close_effect_amount"`
-			CommissionEnrolled        float64     `json:"commission_enrolled"`
+			CommissionEnrolled        float64 `json:"commission_enrolled"`
 			InstrumentActiveID        int     `json:"instrument_active_id"`
 			InstrumentIDEscape        string  `json:"instrument_id_escape"`
-			SellAmountEnrolled        float64     `json:"sell_amount_enrolled"`
+			SellAmountEnrolled        float64 `json:"sell_amount_enrolled"`
 			TakeProfitOrderID         any     `json:"take_profit_order_id"`
 			InstrumentExpiration      int     `json:"instrument_expiration"`
 			InstrumentUnderlying      string  `json:"instrument_underlying"`
 			OpenUnderlyingPrice       float64 `json:"open_underlying_price"`
-			PnlRealizedEnrolled       float64     `json:"pnl_realized_enrolled"`
+			PnlRealizedEnrolled       float64 `json:"pnl_realized_enrolled"`
 			BuyAvgPriceEnrolled       float64 `json:"buy_avg_price_enrolled"`
 			CloseUnderlyingPrice      any     `json:"close_underlying_price"`
 			InstrumentStrikeValue     int     `json:"instrument_strike_value"`
 			OpenClientPlatformID      int     `json:"open_client_platform_id"`
-			SellAvgPriceEnrolled      float64     `json:"sell_avg_price_enrolled"`
+			SellAvgPriceEnrolled      float64 `json:"sell_avg_price_enrolled"`
 			CloseEffectAmountEnrolled any     `json:"close_effect_amount_enrolled"`
 		} `json:"digital_options_position_changed1"`
 	} `json:"raw_event"`
@@ -171,145 +164,15 @@ type DigitalResult struct {
 	Status                 string  `json:"status"`
 	OpenTime               int     `json:"open_time"`
 	OpenQuote              float64 `json:"open_quote"`
-	Invest                 float64     `json:"invest"`
-	InvestEnrolled         float64     `json:"invest_enrolled"`
+	Invest                 float64 `json:"invest"`
+	InvestEnrolled         float64 `json:"invest_enrolled"`
 	SellProfit             float64 `json:"sell_profit"`
 	SellProfitEnrolled     float64 `json:"sell_profit_enrolled"`
-	ExpectedProfit         float64     `json:"expected_profit"`
-	ExpectedProfitEnrolled float64     `json:"expected_profit_enrolled"`
+	ExpectedProfit         float64 `json:"expected_profit"`
+	ExpectedProfitEnrolled float64 `json:"expected_profit_enrolled"`
 	Pnl                    float64 `json:"pnl"`
 	PnlNet                 float64 `json:"pnl_net"`
 	CurrentPrice           float64 `json:"current_price"`
 	QuoteTimestamp         int     `json:"quote_timestamp"`
 	Swap                   int     `json:"swap"`
-}
-
-func CheckResultBinary(ws *Socket, tradeID int, timeout time.Time) (*BinaryResult, bool, error) {
-	debug.IfVerbose.Printf("Calling check result binary with tradeID: %d\n", tradeID)
-
-	var err error = nil
-	var res binaryTradeData
-
-	ws.AddEventListener("position-changed", func(event []byte) {
-		res, err = tjson.Unmarshal[binaryTradeData](event)
-
-		debug.IfVerbose.Println("Position changed for binary trade")
-		debug.IfVerbose.PrintAsJSON(res)
-	})
-
-	for res.Msg.ExternalID != tradeID || res.Msg.Status != "closed" {
-		time.Sleep(time.Second)
-
-		if ws.Closed {
-			err = fmt.Errorf("websocket closed")
-			break
-		}
-
-		if time.Since(timeout) > 0 {
-			err = fmt.Errorf("timed out waiting for response")
-			break
-		}
-
-		debug.IfVerbose.Println("Position changed for binary trade:", res.Msg.Status, res.Msg.ExternalID, tradeID)
-	}
-
-	ws.RemoveEventListener("position-changed")
-
-	win := res.Msg.CloseReason == "win"
-	debug.IfVerbose.Println("Result:", res.Msg.Status, res.Msg.ExternalID, tradeID, win)
-
-	if err != nil {
-		return nil, false, err
-	}
-
-	return &res.Msg, res.Msg.CloseReason == "win", err
-}
-
-func CheckResultDigital(ws *Socket, tradeID int, timeout time.Time) (*DigitalResult, bool, error) {
-	debug.IfVerbose.Printf("Calling check result digital with tradeID: %d\n", tradeID)
-
-	var err error = nil
-	var res digitalTradeData
-
-	ws.AddEventListener("position-changed", func(event []byte) {
-		res, err = tjson.Unmarshal[digitalTradeData](event)
-
-		debug.IfVerbose.Println("Position changed for digital trade")
-		debug.IfVerbose.PrintAsJSON(res)
-	})
-
-	for {
-		time.Sleep(time.Second)
-
-		if ws.Closed {
-			err = fmt.Errorf("websocket closed")
-			break
-		}
-
-		if time.Since(timeout) > 0 {
-			err = fmt.Errorf("timed out waiting for response")
-		}
-
-		orderIDs := res.Msg.RawEvent.DigitalOptionsPositionChanged1.OrderIds
-
-		if len(orderIDs) == 0 {
-			continue
-		}
-
-		orderID := res.Msg.RawEvent.DigitalOptionsPositionChanged1.OrderIds[0]
-
-		if orderID != tradeID {
-			continue
-		}
-
-		debug.IfVerbose.Println("Position changed for digital trade:", res.Msg.Status, orderID, tradeID)
-
-		if res.Msg.Status != "closed" {
-			continue
-		}
-
-		break
-	}
-
-	ws.RemoveEventListener("position-changed")
-
-	win := res.Msg.Pnl > 0
-	debug.IfVerbose.Println("Check result digital: ", res.Msg.Pnl, win)
-
-	if err != nil {
-		return nil, false, err
-	}
-
-	return &res.Msg, win, err
-}
-
-func GetSubscriptionsToPositionChangedEvent(userID int, userBalanceID int) []*RequestEvent {
-	var intrumentTypesForSubscription = []string{
-		"binary-option",
-		"digital-option",
-		"turbo-option",
-	}
-
-	var requestEvents = make([]*RequestEvent, 0)
-
-	for _, instrumentTypeForSubscription := range intrumentTypesForSubscription {
-		newRequest := &RequestEvent{
-			Name: "subscribeMessage",
-			Msg: map[string]interface{}{
-				"name":    "portfolio.position-changed",
-				"version": "3.0",
-				"params": map[string]interface{}{
-					"routingFilters": map[string]interface{}{
-						"user_id":         userID,
-						"user_balance_id": userBalanceID,
-						"instrument_type": instrumentTypeForSubscription,
-					},
-				},
-			},
-		}
-
-		requestEvents = append(requestEvents, newRequest)
-	}
-
-	return requestEvents
 }
