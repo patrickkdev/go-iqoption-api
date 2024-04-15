@@ -2,7 +2,6 @@ package brokerws
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"sync"
@@ -11,12 +10,11 @@ import (
 	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
 
 	"nhooyr.io/websocket"
-	"nhooyr.io/websocket/wsjson"
 )
 
 type EventCallback func(event []byte)
 
-type Socket struct {
+type WebSocket struct {
 	Conn               *websocket.Conn
 	Closed             bool
 	eventHandlers      map[string]EventCallback
@@ -26,7 +24,7 @@ type Socket struct {
 
 const timeout = time.Second * 15
 
-func NewSocketConnection(url string, onLoseConnection func()) (*Socket, error) {
+func NewSocketConnection(url string, onLoseConnection func()) (*WebSocket, error) {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), timeout)
 	defer ctxCancel()
 
@@ -51,7 +49,7 @@ func NewSocketConnection(url string, onLoseConnection func()) (*Socket, error) {
 
 	conn.SetReadLimit(-1)
 
-	newSocketConnection := &Socket{
+	newSocketConnection := &WebSocket{
 		eventHandlers: make(map[string]EventCallback),
 		Conn:          conn,
 		Closed:        false,
@@ -67,59 +65,15 @@ func NewSocketConnection(url string, onLoseConnection func()) (*Socket, error) {
 	return newSocketConnection, nil
 }
 
-func (ws *Socket) Close() {
+func (ws *WebSocket) IsConnectionOK() bool {
+	return !ws.Closed
+}
+
+func (ws *WebSocket) Close() {
 	ws.Conn.Close(websocket.StatusNormalClosure, "close")
 }
 
-func (ws *Socket) EmitEvent(event interface{}) {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*15)
-
-	wsjson.Write(ctx, ws.Conn, event)
-	ctxCancel()
-}
-
-func (ws *Socket) AddEventListener(name string, callback EventCallback) {
-	ws.eventHandlersMutex.Lock()
-	ws.eventHandlers[name] = callback
-	ws.eventHandlersMutex.Unlock()
-}
-
-func (ws *Socket) RemoveEventListener(name string) {
-	ws.eventHandlersMutex.Lock()
-	delete(ws.eventHandlers, name)
-	ws.eventHandlersMutex.Unlock()
-}
-
-func (ws *Socket) handleEvent(eventB []byte) {
-	reportEventError := func(errMessage string) {
-		debug.IfVerbose.Println(errMessage)
-	}
-
-	event := new(struct {
-		Name   string      `json:"name"`
-		Result interface{} `json:"result"`
-	})
-
-	err := json.Unmarshal(eventB, &event)
-
-	if err != nil {
-		reportEventError("error unmarshalling event")
-		return
-	}
-
-	ws.eventHandlersMutex.Lock()
-	callback, ok := ws.eventHandlers[event.Name]
-	ws.eventHandlersMutex.Unlock()
-
-	if !ok {
-		reportEventError("no callback found for event: " + event.Name)
-		return
-	}
-
-	callback(eventB)
-}
-
-func (ws *Socket) Listen(onLoseConnection func()) {
+func (ws *WebSocket) Listen(onLoseConnection func()) {
 	var errorCount int = 0
 
 	for {

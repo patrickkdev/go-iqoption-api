@@ -1,4 +1,4 @@
-package brokerhttp
+package broker
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ type LoginData struct {
 	Token    *string `json:"token,omitempty"`
 }
 
-func Login(url string, session *Session) error {
+func httpLogin(url string, session *Session) error {
 	resp, err := session.PostFromStruct(url, session.LoginData, nil)
 
 	if err != nil {
@@ -24,6 +24,18 @@ func Login(url string, session *Session) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func httpLogout(url string, session *Session) error {
+	resp, err := session.PostFromStruct(url, nil, nil)
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
 
 	return nil
 }

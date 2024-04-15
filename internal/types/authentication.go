@@ -1,4 +1,4 @@
-package btypes
+package types
 
 type AuthenticationResponse struct {
 	Name            string `json:"name"`

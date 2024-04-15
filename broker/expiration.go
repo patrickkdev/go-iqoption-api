@@ -1,10 +1,10 @@
-package brokerws
+package broker
 
 import (
 	"time"
 )
 
-func GetExpirationTime(timestamp int64, duration int) (int, int) {
+func getExpirationTime(timestamp int64, duration int) (int, int) {
 	now := time.Unix(timestamp, 0)
 	expDate := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 0, 0, now.Location())
 

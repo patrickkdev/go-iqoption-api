@@ -1,55 +1,64 @@
-package brokerws
+package broker
 
 import (
 	"strings"
 
-	"github.com/patrickkdev/Go-IQOption-API/btypes"
 	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
 	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
+	"github.com/patrickkdev/Go-IQOption-API/internal/types"
 )
 
 type TradeChangedCallbacks struct {
-	OnTradeOpenedCallback func(tradeData btypes.TradeData)
-	OnTradeClosedCallback func(tradeData btypes.TradeData)
+	onTradeOpened func(tradeData TradeData)
+	onTradeClosed func(tradeData TradeData)
 }
 
-func (ws *Socket) OnTradeChanged(callbacks TradeChangedCallbacks) {
-	lastTradeID := make(map[btypes.AssetType]int)
+// If called more than once, the previous callback will not be called
+func (c *Client) OnTradeOpened(callback func(tradeData TradeData)) {
+	c.openTradeCallback = callback
+}
 
-	ws.AddEventListener("position-changed", func(event []byte) {
+func (c *Client) onTradeClosed(tradeID int, callback func(tradeData TradeData)) {
+	c.onTradeClosedCallback[tradeID] = callback
+}
+
+func (c *Client) onTradeChanged(callbacks TradeChangedCallbacks) {
+	lastTradeID := make(map[AssetType]int)
+
+	c.ws.AddEventListener("position-changed", func(event []byte) {
 		eventString := string(event)
-		tradeData := btypes.TradeData{ActiveID: 0}
+		tradeData := TradeData{ActiveID: 0}
 
 		if strings.Contains(eventString, "binary_options_option_changed1") {
-			res, err := tjson.Unmarshal[binaryTradeData](event)
+			res, err := tjson.Unmarshal[types.BinaryTradeData](event)
 			if err != nil {
 				return
 			}
 
 			tradeData.Status = res.Msg.Status
 			tradeData.TradeID = res.Msg.ExternalID
-			tradeData.Type = btypes.AssetTypeBinary
+			tradeData.Type = AssetTypeBinary
 			tradeData.ActiveID = res.Msg.ActiveID
 			tradeData.TimeFrameInMinutes = max((res.Msg.RawEvent.BinaryOptionsOptionChanged1.ExpirationTime-res.Msg.RawEvent.BinaryOptionsOptionChanged1.OpenTime)/60, 1)
 			tradeData.Amount = res.Msg.RawEvent.BinaryOptionsOptionChanged1.Amount
-			tradeData.Direction = btypes.TradeDirection(res.Msg.RawEvent.BinaryOptionsOptionChanged1.Direction)
+			tradeData.Direction = TradeDirection(res.Msg.RawEvent.BinaryOptionsOptionChanged1.Direction)
 			tradeData.Win = res.Msg.CloseReason == "win"
 			tradeData.OpenTime = res.Msg.OpenTime
 			tradeData.Profit = res.Msg.Pnl
 
 		} else if strings.Contains(eventString, "digital_options_position_changed1") {
-			res, err := tjson.Unmarshal[digitalTradeData](event)
+			res, err := tjson.Unmarshal[types.DigitalTradeData](event)
 			if err != nil {
 				return
 			}
 
 			tradeData.Status = res.Msg.Status
 			tradeData.TradeID = res.Msg.RawEvent.DigitalOptionsPositionChanged1.OrderIds[0]
-			tradeData.Type = btypes.AssetTypeDigital
+			tradeData.Type = AssetTypeDigital
 			tradeData.ActiveID = res.Msg.ActiveID
 			tradeData.TimeFrameInMinutes = max(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentPeriod/60, 1)
 			tradeData.Amount = res.Msg.RawEvent.DigitalOptionsPositionChanged1.BuyAmount
-			tradeData.Direction = btypes.TradeDirection(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentDir)
+			tradeData.Direction = TradeDirection(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentDir)
 			tradeData.Win = res.Msg.Pnl > 0
 			tradeData.OpenTime = res.Msg.OpenTime
 			tradeData.Profit = res.Msg.Pnl
@@ -60,13 +69,13 @@ func (ws *Socket) OnTradeChanged(callbacks TradeChangedCallbacks) {
 		}
 
 		if tradeData.Status == "open" {
-			if callbacks.OnTradeOpenedCallback != nil && lastTradeID[tradeData.Type] != tradeData.OpenTime {
-				callbacks.OnTradeOpenedCallback(tradeData)
+			if callbacks.onTradeOpened != nil && lastTradeID[tradeData.Type] != tradeData.OpenTime {
+				callbacks.onTradeOpened(tradeData)
 				lastTradeID[tradeData.Type] = tradeData.OpenTime
 			}
 		} else if tradeData.Status == "closed" {
-			if callbacks.OnTradeClosedCallback != nil {
-				callbacks.OnTradeClosedCallback(tradeData)
+			if callbacks.onTradeClosed != nil {
+				callbacks.onTradeClosed(tradeData)
 			}
 		} else {
 			debug.IfVerbose.Printf("Unknown trade status: %s\n", tradeData.Status)
@@ -74,7 +83,7 @@ func (ws *Socket) OnTradeChanged(callbacks TradeChangedCallbacks) {
 	})
 }
 
-func (ws *Socket) SubscribeToTradeChanges(balances btypes.Balances) {
+func (c *Client) subscribeToTradeChanges() {
 	instrumentTypesForSubscription := []string{
 		"binary-option",
 		"digital-option",
@@ -82,11 +91,11 @@ func (ws *Socket) SubscribeToTradeChanges(balances btypes.Balances) {
 	}
 
 	// for each balance
-	for _, balance := range balances {
+	for _, balance := range c.balances {
 
 		// and for each instrument type
 		for _, instrumentTypeForSubscription := range instrumentTypesForSubscription {
-			newRequest := &btypes.RequestEvent{
+			newRequest := requestEvent{
 				Name: "subscribeMessage",
 				Msg: map[string]interface{}{
 					"name":    "portfolio.position-changed",
@@ -99,10 +108,9 @@ func (ws *Socket) SubscribeToTradeChanges(balances btypes.Balances) {
 						},
 					},
 				},
-			}
+			}.WithRandomRequestId()
 
-			ws.Emit(newRequest)
+			c.ws.Emit(newRequest)
 		}
 	}
-
 }

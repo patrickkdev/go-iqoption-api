@@ -1,4 +1,8 @@
-package btypes
+package broker
+
+import (
+	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
+)
 
 type CoreProfile struct {
 	ClientSessionID string `json:"client_session_id"`
@@ -115,4 +119,56 @@ type UserProfileClient struct {
 		Gender              string        `json:"gender"`
 	} `json:"msg"`
 	Status int `json:"status"`
+}
+
+// Get core profile data
+// This is mostly used to get clientSessionID in order to call GetProfile
+func (c *Client) GetCoreProfile() (CoreProfile, error) {
+	requestEvent := requestEvent{
+		Name: "sendMessage",
+		Msg: map[string]interface{}{
+			"name":    "core.get-profile",
+			"body":    map[string]interface{}{},
+			"version": "1.0",
+		},
+	}.WithRandomRequestId()
+
+	resp, err := c.ws.EmitWithResponse(requestEvent, "profile", c.getTimeout())
+	if err != nil {
+		return CoreProfile{}, err
+	}
+
+	responseEvent, err := tjson.Unmarshal[CoreProfile](resp)
+	if err != nil {
+		return CoreProfile{}, err
+	}
+
+	return responseEvent, nil
+}
+
+// Get user profile client
+// You need to pass clientSessionID from GetCoreProfile in order to call this function.
+func (c *Client) GetUserProfileClient(userId int) (UserProfileClient, error) {
+	requestEvent := requestEvent{
+		Name: "sendMessage",
+		Msg: map[string]interface{}{
+			"name": "get-user-profile-client",
+			"body": map[string]interface{}{
+				"user_id": userId,
+			},
+			"version": "1.0",
+		},
+	}.WithRandomRequestId()
+
+	resp, err := c.ws.EmitWithResponse(requestEvent, "user-profile-client", c.getTimeout())
+	if err != nil {
+		return UserProfileClient{}, err
+	}
+
+	responseEvent, err := tjson.Unmarshal[UserProfileClient](resp)
+	if err != nil {
+		return UserProfileClient{}, err
+	}
+
+	return responseEvent, nil
 }

@@ -1,16 +1,15 @@
-package btypes
+package types
 
-type TradeData struct {
-	Status             string
-	TradeID            int
-	Type               AssetType
-	Direction          TradeDirection
-	TimeFrameInMinutes int
-	ActiveID           int
-	Amount             float64
-	Win                bool
-	OpenTime           int
-	Profit             float64
+type BinaryTradeData struct {
+	Name             string       `json:"name"`
+	MicroserviceName string       `json:"microserviceName"`
+	Msg              BinaryResult `json:"msg"`
+}
+
+type DigitalTradeData struct {
+	Name             string        `json:"name"`
+	MicroserviceName string        `json:"microserviceName"`
+	Msg              DigitalResult `json:"msg"`
 }
 
 type BinaryResult struct {
@@ -175,4 +174,38 @@ type DigitalResult struct {
 	CurrentPrice           float64 `json:"current_price"`
 	QuoteTimestamp         int     `json:"quote_timestamp"`
 	Swap                   int     `json:"swap"`
+}
+
+type TradeDigitalResponseEvent struct {
+	RequestID string `json:"request_id"`
+	Name      string `json:"name"`
+	Msg       struct {
+		ID int `json:"id"`
+	} `json:"msg"`
+	Status int `json:"status"`
+}
+
+type TradeBinaryResponseEvent struct {
+	RequestID string `json:"request_id"`
+	Name      string `json:"name"`
+	Msg       struct {
+		UserID             int64       `json:"user_id"`
+		ID                 int         `json:"id"`
+		RefundValue        int64       `json:"refund_value"`
+		Price              int64       `json:"price"`
+		Exp                int64       `json:"exp"`
+		Created            int64       `json:"created"`
+		CreatedMillisecond int64       `json:"created_millisecond"`
+		TimeRate           int64       `json:"time_rate"`
+		Type               string      `json:"type"`
+		Act                int64       `json:"act"`
+		Direction          string      `json:"direction"`
+		ExpValue           int64       `json:"exp_value"`
+		Value              float64     `json:"value"`
+		ProfitIncome       int64       `json:"profit_income"`
+		ProfitReturn       int64       `json:"profit_return"`
+		RobotID            interface{} `json:"robot_id"`
+		ClientPlatformID   int64       `json:"client_platform_id"`
+	} `json:"msg"`
+	Status int64 `json:"status"`
 }

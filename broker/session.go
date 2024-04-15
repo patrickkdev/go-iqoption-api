@@ -1,4 +1,4 @@
-package brokerhttp
+package broker
 
 import (
 	"bytes"

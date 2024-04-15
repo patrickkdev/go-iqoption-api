@@ -5,13 +5,11 @@ import (
 	"time"
 
 	"github.com/patrickkdev/Go-IQOption-API/broker"
-	"github.com/patrickkdev/Go-IQOption-API/btypes"
-	"github.com/patrickkdev/Go-IQOption-API/internal/brokerhttp"
 )
 
 func main() {
 	// Mock login data
-	loginData := brokerhttp.LoginData{
+	loginData := broker.LoginData{
 		Email:    "patrickfxtrader8q@gmail.com",
 		Password: "YOUTAP2019",
 	}
@@ -23,7 +21,7 @@ func main() {
 	timeout := time.Second * 10
 	client := broker.NewClient(loginData, hostName, timeout)
 
-	_, err := client.Login()
+	err := client.Login()
 	if err != nil {
 		fmt.Printf("Login failed: %v\n", err)
 	}
@@ -48,29 +46,29 @@ func main() {
 		}
 	}
 
-	client.OnTradeOpened(func(tradeData btypes.TradeData) {
+	client.OnTradeOpened(func(tradeData broker.TradeData) {
 		fmt.Println(tradeData.TimeFrameInMinutes, " minute trade opened: ", tradeData.TradeID)
 	})
 
-	newAssets, err := client.GetAssets(btypes.AssetTypeDigital)
+	newAssets, err := client.GetAssets(broker.AssetTypeDigital)
 	if err != nil {
 		fmt.Printf("Failed to get assets: %v\n", err)
 	} else {
-		assets := newAssets.FilterOpen()
+		assets := newAssets.FilterOutNonTradable()
 
 		for i, asset := range assets {
 			fmt.Println(i, asset.ActiveID)
 		}
 	}
 
-	tradeType := btypes.AssetTypeDigital
+	tradeType := broker.AssetTypeDigital
 	tradeID := 0
 	timeFrame := 1 // Time frame in minutefmt.Println Wait timesync
 	time.Sleep(time.Second * 1)
 
 openTrade:
 	// Replace parameters with appropriate values
-	newTradeID, err := client.OpenTrade(tradeType, 100.0, btypes.TradeDirectionCall, 1, timeFrame, btypes.BalanceTypeDemo)
+	newTradeID, err := client.OpenTrade(tradeType, 100.0, broker.TradeDirectionCall, 1, timeFrame, broker.BalanceTypeDemo)
 	if err != nil {
 		fmt.Printf("Failed to open trade: %v\n", err)
 	}
@@ -87,13 +85,15 @@ openTrade:
 		fmt.Printf("Failed to check trade result: %v\n", err)
 	}
 
-	if tradeType == btypes.AssetTypeDigital {
-		tradeType = btypes.AssetTypeBinary
-		timeFrame = 5
+	if tradeType == broker.AssetTypeDigital {
+		tradeType = broker.AssetTypeBinary
 		goto openTrade
 	}
 
 	for {
+		balance, _ := client.GetBalance(broker.BalanceTypeDemo)
+
+		fmt.Printf("Demo Balance: %f\n", balance.Amount)
 		time.Sleep(time.Second * 1)
 	}
 }
