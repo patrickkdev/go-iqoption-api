@@ -3,13 +3,14 @@ package debug
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 type Condition bool
 
 var IfVerbose Condition = isVerbose()
 
-func If (condition bool) Condition {
+func If(condition bool) Condition {
 	return Condition(condition)
 }
 
@@ -25,7 +26,7 @@ func (c Condition) Printf(format string, a ...any) {
 	if !c {
 		return
 	}
-	
+
 	fmt.Printf(format, a...)
 }
 
@@ -37,12 +38,12 @@ func (c Condition) PrintAsJSON(data interface{}) {
 	PrintAsJSON(data)
 }
 
-func isVerbose () Condition	{
+func isVerbose() Condition {
 	if len(os.Args) < 2 {
 		return Condition(false)
 	}
 
-	verbose := os.Args[1] == "-v"
+	verbose := strings.ToLower(os.Args[1]) == "-verbose=broker"
 
 	return Condition(verbose)
 }
