@@ -22,10 +22,8 @@ type WebSocket struct {
 	WaitGroup          *sync.WaitGroup
 }
 
-const timeout = time.Second * 15
-
-func NewSocketConnection(url string, onLoseConnection func()) (*WebSocket, error) {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), timeout)
+func NewSocketConnection(url string, timeoutDuration time.Duration, onLoseConnection func()) (*WebSocket, error) {
+	ctx, ctxCancel := context.WithTimeout(context.Background(), timeoutDuration)
 	defer ctxCancel()
 
 	var header http.Header = http.Header{}
@@ -60,7 +58,7 @@ func NewSocketConnection(url string, onLoseConnection func()) (*WebSocket, error
 
 	newSocketConnection.WaitGroup.Add(1)
 
-	go newSocketConnection.Listen(onLoseConnection)
+	go newSocketConnection.Listen(timeoutDuration, onLoseConnection)
 
 	return newSocketConnection, nil
 }
@@ -74,12 +72,12 @@ func (ws *WebSocket) Close() {
 	ws.Closed = true
 }
 
-func (ws *WebSocket) Listen(onLoseConnection func()) {
+func (ws *WebSocket) Listen(timeoutDuration time.Duration, onLoseConnection func()) {
 	const maxErrorCount = 5
 	var errorCount int
 
 	for ws.IsConnectionOK() {
-		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+		ctx, cancel := context.WithTimeout(context.Background(), timeoutDuration)
 		defer cancel()
 
 		if errorCount > maxErrorCount {

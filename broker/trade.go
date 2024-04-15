@@ -35,7 +35,12 @@ func (c *Client) CheckTradeResult(tradeID int, timeFrameInMinutes int) (TradeDat
 		return result, fmt.Errorf("invalid trade id")
 	}
 
-	timedOut := time.Now().After(c.getTimeout().Add(time.Duration(timeFrameInMinutes)))
+	timeoutAt := c.getTimeout().Add(time.Minute * time.Duration(timeFrameInMinutes))
+
+	checkTimedOut := func() bool {
+		return time.Now().After(timeoutAt)
+	}
+
 	var err error = nil
 
 	c.onTradeClosed(tradeID, func(tradeData TradeData) {
@@ -43,14 +48,16 @@ func (c *Client) CheckTradeResult(tradeID int, timeFrameInMinutes int) (TradeDat
 	})
 
 	debug.IfVerbose.Println("Waiting for trade result", tradeID)
-	for result.TradeID != tradeID && !timedOut {
+	for result.TradeID != tradeID {
+		if checkTimedOut() {
+			err = fmt.Errorf("timed out waiting for trade result")
+			break
+		}
+
 		time.Sleep(time.Second * 1)
 	}
-
-	if timedOut {
-		err = fmt.Errorf("timed out waiting for trade result")
-		delete(c.onTradeClosedCallback, tradeID)
-	}
+	
+	delete(c.onTradeClosedCallback, tradeID)
 
 	return result, err
 }

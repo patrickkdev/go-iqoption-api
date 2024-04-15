@@ -1,7 +1,6 @@
 package broker
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
@@ -133,11 +132,6 @@ func (c *Client) handleTradeClosed(tradeData TradeData) {
 	callback, ok := c.onTradeClosedCallback[tradeData.TradeID]
 	if !ok || callback == nil {
 		debug.IfVerbose.Printf(" but there is no trade closed callback set for trade it\n")
-
-		for index := range c.onTradeClosedCallback {
-			fmt.Printf("Callback: %d\n", index)
-		}
-
 		return
 	}
 

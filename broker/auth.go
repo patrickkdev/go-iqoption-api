@@ -69,7 +69,7 @@ func (c *Client) ConnectSocket() error {
 		debug.IfVerbose.Println("Reconnected")
 	}
 
-	newSocketConn, err := brokerws.NewSocketConnection(c.brokerEndpoints.WSAPIURL, reconnect)
+	newSocketConn, err := brokerws.NewSocketConnection(c.brokerEndpoints.WSAPIURL, c.defaultTimeoutDuration, reconnect)
 	if err != nil {
 		return err
 	}

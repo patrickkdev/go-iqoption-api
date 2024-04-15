@@ -26,6 +26,7 @@ type Client struct {
 
 // Create new client
 // You can optionally pass SSID to resume session with the broker ws. If omitted, a new ssid will be created when you call Login
+// Recommended timeout duration is 10 seconds (time.Second * 10)
 func NewClient(loginData LoginData, brokerDomain string, defaultTimeoutDuration time.Duration, ssid ...string) *Client {
 	newClient := &Client{
 		brokerEndpoints:         		getEndpointsByBrokerDomain(brokerDomain),

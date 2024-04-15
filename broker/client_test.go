@@ -31,7 +31,7 @@ func TestBrokerClient(t *testing.T) {
 		t.Fatalf("Socket connection failed: %v\n", err)
 	}
 
-	for !client.IsConnectionOK() {
+	for !client.IsReady() {
 		time.Sleep(time.Second * 1)
 	}
 

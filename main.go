@@ -41,10 +41,17 @@ func main() {
 		fmt.Println(tradeData.TimeFrameInMinutes, " minute trade opened: ", tradeData.TradeID)
 	})
 
+	lastBalance := 0.0
+
 	for {
 		balance, _ := client.GetBalance(broker.BalanceTypeDemo)
 
-		fmt.Printf("Demo Balance: %f\n", balance.Amount)
-		time.Sleep(time.Second * 1)
+		if balance.Amount == lastBalance {
+			continue
+		}
+
+		fmt.Printf("Balance changed: %f\n", balance.Amount)
+
+		lastBalance = balance.Amount
 	}
 }
