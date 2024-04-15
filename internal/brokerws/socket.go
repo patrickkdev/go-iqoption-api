@@ -71,35 +71,45 @@ func (ws *WebSocket) IsConnectionOK() bool {
 
 func (ws *WebSocket) Close() {
 	ws.Conn.Close(websocket.StatusNormalClosure, "close")
+	ws.Closed = true
 }
 
 func (ws *WebSocket) Listen(onLoseConnection func()) {
-	var errorCount int = 0
+	const maxErrorCount = 5
+	var errorCount int
 
-	for {
-		ctx, ctxCancel := context.WithTimeout(context.Background(), timeout)
-		defer ctxCancel()
+	for ws.IsConnectionOK() {
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+		defer cancel()
 
-		if errorCount > 5 {
-			debug.IfVerbose.Println("too many errors")
+		if errorCount > maxErrorCount {
+			debug.IfVerbose.Println("too many errors, closing ws connection")
 			ws.Conn.Close(websocket.StatusAbnormalClosure, "close")
 			ws.Closed = true
-		}
 
-		if ws.Closed {
-			onLoseConnection()
 			break
 		}
 
 		_, message, err := ws.Conn.Read(ctx)
-		ctxCancel()
+		cancel()
 
 		if err != nil {
+			if websocket.CloseStatus(err) == websocket.StatusNormalClosure {
+				// Connection closed by remote host
+				break
+			}
+
 			debug.IfVerbose.Println("error reading ws event:", err)
 			errorCount++
 			continue
 		}
 
+		// Reset error count on successful read
+		errorCount = 0
+
 		ws.handleEvent(message)
 	}
+
+	// if loop exits then connection is lost
+	onLoseConnection()
 }

@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
@@ -113,4 +114,34 @@ func (c *Client) subscribeToTradeChanges() {
 			c.ws.Emit(newRequest)
 		}
 	}
+}
+
+func (c *Client) handleTradeOpened(tradeData TradeData) {
+	debug.IfVerbose.Printf("Trade %d opened", tradeData.TradeID)
+
+	if c.openTradeCallback != nil {
+		c.openTradeCallback(tradeData)
+		debug.IfVerbose.Printf(" calling open trade callback\n")
+	} else {
+		debug.IfVerbose.Printf(" but there is no open trade callback set\n")
+	}
+}
+
+func (c *Client) handleTradeClosed(tradeData TradeData) {
+	debug.IfVerbose.Printf("Trade %d closed", tradeData.TradeID)
+
+	callback, ok := c.onTradeClosedCallback[tradeData.TradeID]
+	if !ok || callback == nil {
+		debug.IfVerbose.Printf(" but there is no trade closed callback set for trade it\n")
+
+		for index := range c.onTradeClosedCallback {
+			fmt.Printf("Callback: %d\n", index)
+		}
+
+		return
+	}
+
+	debug.IfVerbose.Printf(" calling trade closed callback\n")
+	callback(tradeData)
+	delete(c.onTradeClosedCallback, tradeData.TradeID)
 }
