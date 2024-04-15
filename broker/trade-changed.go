@@ -57,7 +57,7 @@ func (c *Client) onTradeChanged(callbacks TradeChangedCallbacks) {
 			tradeData.TradeID = res.Msg.RawEvent.DigitalOptionsPositionChanged1.OrderIds[0]
 			tradeData.Type = AssetTypeDigital
 			tradeData.ActiveID = res.Msg.ActiveID
-			tradeData.TimeFrameInMinutes = int(math.Round(float64(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentPeriod)/float64(60)))
+			tradeData.TimeFrameInMinutes = res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentPeriod / 60
 			tradeData.Amount = res.Msg.RawEvent.DigitalOptionsPositionChanged1.BuyAmount
 			tradeData.Direction = TradeDirection(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentDir)
 			tradeData.Win = res.Msg.Pnl > 0
@@ -70,7 +70,7 @@ func (c *Client) onTradeChanged(callbacks TradeChangedCallbacks) {
 		}
 
 		if tradeData.Status == "open" {
-			if callbacks.onTradeOpened != nil && lastTradeID[tradeData.Type] != tradeData.OpenTime {
+			if callbacks.onTradeOpened != nil && lastTradeID[tradeData.Type] != tradeData.TradeID {
 				callbacks.onTradeOpened(tradeData)
 				lastTradeID[tradeData.Type] = tradeData.TradeID
 			}
