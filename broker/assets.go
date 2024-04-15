@@ -45,7 +45,7 @@ func (c *Client) GetAssets(type_ AssetType) (Assets, error) {
 }
 
 // Filters out assets that are probably not tradable
-func (assets *Assets) FilterOutNonTradable() Assets {
+func (assets *Assets) WithoutNonTradable() Assets {
 	var newAssets Assets = Assets{}
 
 	for _, asset := range *assets {
