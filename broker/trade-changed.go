@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"math"
 	"strings"
 
 	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
@@ -39,7 +40,7 @@ func (c *Client) onTradeChanged(callbacks TradeChangedCallbacks) {
 			tradeData.TradeID = res.Msg.ExternalID
 			tradeData.Type = AssetTypeBinary
 			tradeData.ActiveID = res.Msg.ActiveID
-			tradeData.TimeFrameInMinutes = max((res.Msg.RawEvent.BinaryOptionsOptionChanged1.ExpirationTime-res.Msg.RawEvent.BinaryOptionsOptionChanged1.OpenTime)/60, 1)
+			tradeData.TimeFrameInMinutes = int(math.Round(float64(res.Msg.RawEvent.BinaryOptionsOptionChanged1.ExpirationTime - res.Msg.RawEvent.BinaryOptionsOptionChanged1.OpenTime) / float64(60)))
 			tradeData.Amount = res.Msg.RawEvent.BinaryOptionsOptionChanged1.Amount
 			tradeData.Direction = TradeDirection(res.Msg.RawEvent.BinaryOptionsOptionChanged1.Direction)
 			tradeData.Win = res.Msg.CloseReason == "win"
@@ -56,7 +57,7 @@ func (c *Client) onTradeChanged(callbacks TradeChangedCallbacks) {
 			tradeData.TradeID = res.Msg.RawEvent.DigitalOptionsPositionChanged1.OrderIds[0]
 			tradeData.Type = AssetTypeDigital
 			tradeData.ActiveID = res.Msg.ActiveID
-			tradeData.TimeFrameInMinutes = max(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentPeriod/60, 1)
+			tradeData.TimeFrameInMinutes = int(math.Round(float64(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentPeriod)/float64(60)))
 			tradeData.Amount = res.Msg.RawEvent.DigitalOptionsPositionChanged1.BuyAmount
 			tradeData.Direction = TradeDirection(res.Msg.RawEvent.DigitalOptionsPositionChanged1.InstrumentDir)
 			tradeData.Win = res.Msg.Pnl > 0
@@ -71,7 +72,7 @@ func (c *Client) onTradeChanged(callbacks TradeChangedCallbacks) {
 		if tradeData.Status == "open" {
 			if callbacks.onTradeOpened != nil && lastTradeID[tradeData.Type] != tradeData.OpenTime {
 				callbacks.onTradeOpened(tradeData)
-				lastTradeID[tradeData.Type] = tradeData.OpenTime
+				lastTradeID[tradeData.Type] = tradeData.TradeID
 			}
 		} else if tradeData.Status == "closed" {
 			if callbacks.onTradeClosed != nil {
