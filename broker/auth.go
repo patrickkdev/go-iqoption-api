@@ -53,11 +53,11 @@ func Logout(url string, session *Session) error {
 // Automatically subscribes to default events like 'balance-changed', 'trade-changed', 'timesync' and 'position-changed'
 func (c *Client) ConnectSocket(connRetryCount ...int) error {
 	maxRetryCount := 10
-	retryCount := 0
+	retryCount := -1
 
 	if len(connRetryCount) > 0 {
 		retryCount = connRetryCount[0]
-		fmt.Printf("Reconnecting user %s... (%d/%d)\n", c.session.LoginData.Email, retryCount, 10)
+		debug.IfVerbose.Printf("Reconnecting user %s... (%d/%d)\n", c.session.LoginData.Email, retryCount, 10)
 	}
 
 	if retryCount >= maxRetryCount {
@@ -66,6 +66,11 @@ func (c *Client) ConnectSocket(connRetryCount ...int) error {
 
 	// Try to persist connection
 	reconnect := func() {
+		if retryCount == -1 {
+			// -1 means that the connection wasn't lost, it failed right on the first try
+			return
+		}
+
 		time.Sleep(time.Minute)
 
 		err := c.ConnectSocket(retryCount + 1)
