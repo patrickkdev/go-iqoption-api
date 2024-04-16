@@ -23,7 +23,7 @@ type WebSocket struct {
 }
 
 func NewSocketConnection(url string, timeoutDuration time.Duration, onLoseConnection func()) (*WebSocket, error) {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), timeoutDuration)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second)
 	defer ctxCancel()
 
 	var header http.Header = http.Header{}
@@ -82,9 +82,6 @@ func (ws *WebSocket) Listen(timeoutDuration time.Duration, onLoseConnection func
 
 		if errorCount > maxErrorCount {
 			debug.IfVerbose.Println("too many errors, closing ws connection")
-			ws.Conn.Close(websocket.StatusAbnormalClosure, "close")
-			ws.Closed = true
-
 			break
 		}
 
@@ -108,5 +105,7 @@ func (ws *WebSocket) Listen(timeoutDuration time.Duration, onLoseConnection func
 		ws.handleEvent(message)
 	}
 
+	ws.Conn.Close(websocket.StatusAbnormalClosure, "close")
+	ws.Closed = true
 	onLoseConnection()
 }
