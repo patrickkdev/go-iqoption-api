@@ -1,6 +1,8 @@
 package broker
 
 import (
+	"fmt"
+
 	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
 	"github.com/patrickkdev/Go-IQOption-API/internal/types"
 )
@@ -24,6 +26,10 @@ func (c *Client) authenticate() (*types.AuthenticationResponse, error) {
 	responseEvent, err := tjson.Unmarshal[types.AuthenticationResponse](resp)
 	if err != nil {
 		return nil, err
+	}
+
+	if !responseEvent.Msg {
+		return nil, fmt.Errorf("authentication failed")
 	}
 
 	return &responseEvent, nil

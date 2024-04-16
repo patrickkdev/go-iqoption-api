@@ -10,12 +10,12 @@ import (
 func main() {
 	// Mock login data
 	loginData := broker.LoginData{
-		Email:    "patrickfxtrader8q@gmail.com",
-		Password: "YOUTAP2019",
+		Email:    "yoneclick@gmail.com",
+		Password: "Junio020499",
 	}
 
 	// Mock host name
-	hostName := "iqoption.com"
+	hostName := "trade.exnova.com"
 
 	// Timeout for requests
 	timeout := time.Second * 10
@@ -24,7 +24,7 @@ func main() {
 	err := client.Login()
 	if err != nil {
 		fmt.Printf("Login failed: %v\n", err)
-	}
+	}  
 
 	err = client.ConnectSocket()
 	if err != nil {
@@ -34,7 +34,6 @@ func main() {
 	for !client.IsReady() {
 		time.Sleep(time.Second * 1)
 	}
-
 	fmt.Println("Client is ready")
 
 	client.OnTradeOpened(func(tradeData broker.TradeData) {

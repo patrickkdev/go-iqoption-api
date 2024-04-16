@@ -92,7 +92,7 @@ func (ws *WebSocket) Listen(timeoutDuration time.Duration, onLoseConnection func
 		cancel()
 
 		if err != nil {
-			if websocket.CloseStatus(err) == websocket.StatusNormalClosure {
+			if websocket.CloseStatus(err) != websocket.StatusNormalClosure {
 				// Connection closed by remote host
 				break
 			}
@@ -108,6 +108,5 @@ func (ws *WebSocket) Listen(timeoutDuration time.Duration, onLoseConnection func
 		ws.handleEvent(message)
 	}
 
-	// if loop exits then connection is lost
 	onLoseConnection()
 }
