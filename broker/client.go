@@ -80,6 +80,10 @@ func (c *Client) IsReady() bool {
 
 // Returns true if the websocket connection not closed
 func (c *Client) IsConnectionOK() bool {
+	if c.ws == nil {
+		return false
+	}
+
 	return c.ws.IsConnectionOK()
 }
 
