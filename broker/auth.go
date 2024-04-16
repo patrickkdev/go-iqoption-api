@@ -51,26 +51,26 @@ func Logout(url string, session *Session) error {
 // Connect to broker websocket and authenticates
 // Is always trying to reconnect if connection is lost
 // Automatically subscribes to default events like 'balance-changed', 'trade-changed', 'timesync' and 'position-changed'
-func (c *Client) ConnectSocket() error {
-	retryCount := 0
+func (c *Client) ConnectSocket(connRetryCount ...int) error {
 	maxRetryCount := 10
+	retryCount := 0
 
-	// Persist connection
+	if len(connRetryCount) > 0 {
+		retryCount = connRetryCount[0]
+		fmt.Printf("Reconnecting user %s... (%d/%d)\n", c.session.LoginData.Email, retryCount, 10)
+	}
+
+	if retryCount >= maxRetryCount {
+		return fmt.Errorf("max retry count reached for user %s", c.session.LoginData.Email)
+	}
+
+	// Try to persist connection
 	reconnect := func() {
-		for retryCount < maxRetryCount {
-			debug.IfVerbose.Println("Reconnecting...")
-			err := c.ConnectSocket()
-			if err != nil {
-				retryCount++
-				debug.IfVerbose.Println("Reconnect error: ", err.Error())
+		time.Sleep(time.Minute)
 
-				time.Sleep(time.Minute)
-				continue
-			}
-
-			debug.IfVerbose.Println("Reconnected")
-			retryCount = 0
-			break
+		err := c.ConnectSocket(retryCount + 1)
+		if err != nil {
+			debug.IfVerbose.Println("Reconnect error", err.Error())
 		}
 	}
 
@@ -85,14 +85,13 @@ func (c *Client) ConnectSocket() error {
 	c.keepServerTimestampUpdated()
 
 	// Handle authentication
-	resp, err := c.authenticate()
+	_, err = c.authenticate()
 	if err != nil {
 		return err
 	}
 
-	if !resp.Msg {
-		return fmt.Errorf("authentication error")
-	}
+	// Reset retry count if authentication is successful
+	retryCount = 0
 
 	// Get updated balances
 	_, err = c.GetUpdatedBalances()
