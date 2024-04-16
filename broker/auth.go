@@ -52,21 +52,26 @@ func Logout(url string, session *Session) error {
 // Is always trying to reconnect if connection is lost
 // Automatically subscribes to default events like 'balance-changed', 'trade-changed', 'timesync' and 'position-changed'
 func (c *Client) ConnectSocket() error {
+	retryCount := 0
+	maxRetryCount := 10
+
 	// Persist connection
 	reconnect := func() {
-		for {
+		for retryCount < maxRetryCount {
 			debug.IfVerbose.Println("Reconnecting...")
 			err := c.ConnectSocket()
 			if err != nil {
+				retryCount++
 				debug.IfVerbose.Println("Reconnect error: ", err.Error())
-				time.Sleep(time.Second)
+
+				time.Sleep(time.Minute)
 				continue
 			}
 
+			debug.IfVerbose.Println("Reconnected")
+			retryCount = 0
 			break
 		}
-
-		debug.IfVerbose.Println("Reconnected")
 	}
 
 	newSocketConn, err := brokerws.NewSocketConnection(c.brokerEndpoints.WSAPIURL, c.defaultTimeoutDuration, reconnect)

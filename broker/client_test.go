@@ -54,7 +54,7 @@ func TestBrokerClient(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to get assets: %v\n", err)
 	} else {
-		assets := newAssets.FilterOutNonTradable()
+		assets := newAssets.WithoutNonTradable()
 
 		for i, asset := range assets {
 			t.Logf("%d: %d\n", i, asset.ActiveID)
