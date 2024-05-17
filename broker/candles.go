@@ -24,7 +24,7 @@ type Candle struct {
 	Min    float64 `json:"min"`
 	Open   float64 `json:"open"`
 	To     int     `json:"to"`
-	Volume int     `json:"volume"`
+	Volume float64 `json:"volume"`
 }
 
 type Candles []Candle
