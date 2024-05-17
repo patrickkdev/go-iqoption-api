@@ -53,11 +53,11 @@ func Logout(url string, session *Session) error {
 // Automatically subscribes to default events like 'balance-changed', 'trade-changed', 'timesync' and 'position-changed'
 func (c *Client) ConnectSocket(connRetryCount ...int) error {
 	maxRetryCount := 10
-	retryCount := -1
+	retryCount := 0
 
 	if len(connRetryCount) > 0 {
 		retryCount = connRetryCount[0]
-		debug.IfVerbose.Printf("Reconnecting user %s... (%d/%d)\n", c.session.LoginData.Email, retryCount, 10)
+		fmt.Printf("Reconnecting user %s... (%d/%d)\n", c.session.LoginData.Email, retryCount, 10)
 	}
 
 	if retryCount >= maxRetryCount {
@@ -66,11 +66,11 @@ func (c *Client) ConnectSocket(connRetryCount ...int) error {
 
 	// Try to persist connection
 	reconnect := func() {
-		if retryCount == -1 {
-			// -1 means that the connection wasn't lost, it failed right on the first try
-			return
-		}
-
+		// REFACTOR NEEDED
+		
+		return // MAKE NEXT CODE UNREACHABLE IN ORDER TO TEST FUNCIONALITY WITHOUT RECONNECT 
+		
+		// WE SUSPECT THAT THIS RECONNECT FUNCTION IS WHAT IS CAUSING THE SERVER TO SHUT DOWN
 		time.Sleep(time.Minute)
 
 		err := c.ConnectSocket(retryCount + 1)
@@ -86,7 +86,10 @@ func (c *Client) ConnectSocket(connRetryCount ...int) error {
 
 	c.ws = newSocketConn
 
-	c.startAnsweringHeartBeats()
+	// REFACTOR NEEDED
+	// It seems like answering heartbeats is not needed, so we remove it
+	// c.startAnsweringHeartBeats()
+
 	c.keepServerTimestampUpdated()
 
 	// Handle authentication
