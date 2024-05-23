@@ -35,7 +35,7 @@ func (c *Client) CheckTradeResult(tradeID int, timeFrameInMinutes int) (TradeDat
 		return result, fmt.Errorf("invalid trade id")
 	}
 
-	timeoutAt := c.getTimeout().Add(time.Minute * time.Duration(timeFrameInMinutes)).Add(time.Second * 30)
+	timeoutAt := c.getTimeout().Add(time.Minute * time.Duration(timeFrameInMinutes)).Add(time.Minute)
 
 	checkTimedOut := func() bool {
 		return time.Now().After(timeoutAt)
