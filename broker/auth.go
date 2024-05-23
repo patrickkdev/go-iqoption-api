@@ -88,7 +88,7 @@ func (c *Client) ConnectSocket(connRetryCount ...int) error {
 
 	// REFACTOR NEEDED
 	// It seems like answering heartbeats is not needed, so we remove it
-	// c.startAnsweringHeartBeats()
+	c.startAnsweringHeartBeats()
 
 	c.keepServerTimestampUpdated()
 
