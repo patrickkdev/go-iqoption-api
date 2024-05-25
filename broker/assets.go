@@ -65,6 +65,12 @@ func (assets Assets) RemoveByID(id int) Assets {
 }
 
 func (assets Assets) RemoveByIndex(index int) Assets {
+	if index < 0 || index >= len(assets) {
+		fmt.Printf("RemoveByIndex: Invalid index: %d\n", index)
+
+		return assets
+	}
+
 	assets[index] = assets[len(assets)-1]
 	return assets[:len(assets)-1]
 }
