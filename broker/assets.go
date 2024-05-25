@@ -1,6 +1,9 @@
 package broker
 
 import (
+	"fmt"
+	"slices"
+
 	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
 	"github.com/patrickkdev/Go-IQOption-API/internal/types"
 )
@@ -41,34 +44,41 @@ func (c *Client) GetAssets(type_ AssetType) (Assets, error) {
 		return Assets{}, err
 	}
 
+	if responseEvent.Status != 2000 {
+		return Assets{}, fmt.Errorf("error getting assets")
+	}
+
 	return responseEvent.Msg.Data, nil
 }
 
-// Filters out assets that are probably not tradable
-func (assets *Assets) WithoutNonTradable() Assets {
-	var newAssets Assets = Assets{}
-
-	for _, asset := range *assets {
-		if asset.Expiration > 0 &&
-			asset.Volume > 0 &&
-			asset.SpotProfit > 0 &&
-			asset.Volatility > 0 {
-			newAssets = append(newAssets, asset)
-		}
-	}
-
-	return newAssets
-}
-
 // Returns a copy of the assets without the asset with the given id
-func (assets *Assets) Without(id int) Assets {
-	newAssets := Assets{}
+func (assets Assets) RemoveByID(id int) Assets {
+	index := slices.IndexFunc(assets, func(asset types.Asset) bool {
+		return asset.ActiveID == id
+	})
 
-	for _, asset := range *assets {
-		if asset.ActiveID != id {
-			newAssets = append(newAssets, asset)
-		}
+	if index == -1 {
+		return assets
 	}
 
-	return newAssets
+	return assets.RemoveByIndex(index)
 }
+
+func (assets Assets) RemoveByIndex(index int) Assets {
+	assets[index] = assets[len(assets)-1]
+	return assets[:len(assets)-1]
+}
+
+// Less performant
+//
+// func filter(assets Assets, keepCondition func(types.Asset) bool) Assets {
+// 	newAssets := Assets{}
+
+// 	for _, asset := range assets {
+// 		if keepCondition(asset) {
+// 			newAssets = append(newAssets, asset)
+// 		}
+// 	}
+
+// 	return newAssets
+// }
