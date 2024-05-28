@@ -96,6 +96,6 @@ func (c *Client) CloseConnection() {
 	c.ws.Close()
 }
 
-func (c *Client) getTimeout() time.Time {
-	return time.Now().Add(c.defaultTimeoutDuration)
+func (c *Client) getTimeout() time.Duration {
+	return c.defaultTimeoutDuration
 }
