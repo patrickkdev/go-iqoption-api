@@ -10,21 +10,21 @@ type getCandlesResponse struct {
 	Msg struct {
 		Candles []Candle `json:"candles"`
 	} `json:"msg"`
-	Name      string `json:"name"`
-	RequestID string `json:"request_id"`
 	Status    int    `json:"status"`
+	// Name      string `json:"name"`
+	// RequestID string `json:"request_id"`
 }
 
 type Candle struct {
-	At     int64   `json:"at"`
-	Close  float64 `json:"close"`
-	From   int     `json:"from"`
-	ID     int     `json:"id"`
-	Max    float64 `json:"max"`
-	Min    float64 `json:"min"`
 	Open   float64 `json:"open"`
-	To     int     `json:"to"`
-	Volume float64 `json:"volume"`
+	Min    float64 `json:"min"`
+	Max    float64 `json:"max"`
+	Close  float64 `json:"close"`
+	// At     int64   `json:"at"`
+	// From   int     `json:"from"`
+	// ID     int     `json:"id"`
+	// To     int     `json:"to"`
+	// Volume float64 `json:"volume"`
 }
 
 type Candles []Candle
