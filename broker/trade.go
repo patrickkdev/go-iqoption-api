@@ -38,7 +38,7 @@ func (c *Client) CheckTradeResult(tradeID int, timeFrameInMinutes int) (TradeDat
 
 	timeout := c.getTimeout() + time.Minute * time.Duration(timeFrameInMinutes) + time.Minute
 
-	ctx, cancel := context.WithDeadline(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	resultChan := make(chan TradeData)
