@@ -43,7 +43,11 @@ func isVerbose() Condition {
 		return Condition(false)
 	}
 
-	verbose := strings.ToLower(os.Args[1]) == "-verbose=broker"
+	verbose := strings.ToLower(os.Args[1]) == "--verbose=all"
+
+	if verbose {
+		fmt.Println("Verbose mode enabled")
+	}
 
 	return Condition(verbose)
 }
