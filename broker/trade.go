@@ -27,7 +27,7 @@ type TradeData struct {
 	Profit             float64
 }
 
-// Waits until the trade is closed or timed out and returns the trade data
+// CheckTradeResult waits until the trade is closed or timed out and returns the trade data
 func (c *Client) CheckTradeResult(tradeID int, timeFrameInMinutes int) (TradeData, error) {
 	result := TradeData{}
 
@@ -35,29 +35,38 @@ func (c *Client) CheckTradeResult(tradeID int, timeFrameInMinutes int) (TradeDat
 		return result, fmt.Errorf("invalid trade id")
 	}
 
-	timeoutAt := c.getTimeout().Add(time.Minute * time.Duration(timeFrameInMinutes)).Add(time.Minute)
+	timeout := c.getTimeout() + time.Minute * time.Duration(timeFrameInMinutes) + time.Minute
 
-	checkTimedOut := func() bool {
-		return time.Now().After(timeoutAt)
-	}
+	ctx, cancel := context.WithDeadline(context.Background(), timeout)
+	defer cancel()
 
-	var err error = nil
+	resultChan := make(chan TradeData)
+	errorChan := make(chan error)
 
 	c.onTradeClosed(tradeID, func(tradeData TradeData) {
-		result = tradeData
+		select {
+		case resultChan <- tradeData:
+		case <-ctx.Done():
+		}
 	})
 
-	debug.IfVerbose.Println("Waiting for trade result", tradeID)
-	for result.TradeID != tradeID {
-		if checkTimedOut() {
-			err = fmt.Errorf("timed out waiting for trade result")
-			break
+	go func() {
+		<-ctx.Done()
+		if ctx.Err() == context.DeadlineExceeded {
+			errorChan <- fmt.Errorf("timed out waiting for trade result")
 		}
+	}()
 
-		time.Sleep(time.Second * 1)
+	debug.IfVerbose.Println("Waiting for trade result", tradeID)
+
+	select {
+	case result = <-resultChan:
+		debug.IfVerbose.Println("Received trade result for", tradeID)
+	case err := <-errorChan:
+		delete(c.onTradeClosedCallback, tradeID)
+		return result, err
 	}
-	
-	delete(c.onTradeClosedCallback, tradeID)
 
-	return result, err
+	delete(c.onTradeClosedCallback, tradeID)
+	return result, nil
 }
