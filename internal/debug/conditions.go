@@ -1,53 +1,101 @@
-package debug
+package broker
 
 import (
-	"fmt"
-	"os"
-	"strings"
+	"time"
+
+	"github.com/patrickkdev/Go-IQOption-API/internal/brokerws"
 )
 
-type Condition bool
+type Client struct {
+	balances 								Balances
 
-var IfVerbose Condition = isVerbose()
+	session        					Session
+	brokerEndpoints 				brokerEndpoints
 
-func If(condition bool) Condition {
-	return Condition(condition)
+	ws 											*brokerws.WebSocket
+
+	serverTimestamp			 		int64
+
+	// Default timeout duration for requests
+	defaultTimeoutDuration 	time.Duration
+
+	// Callbacks
+	openTradeCallback     	func(tradeData TradeData)
+	onTradeClosedCallback 	map[int]func(tradeData TradeData)
 }
 
-func (c Condition) Println(a ...any) {
-	if !c {
+// Create new client
+// You can optionally pass SSID to resume session with the broker ws. If omitted, a new ssid will be created when you call Login
+// Recommended timeout duration is 10 seconds (time.Second * 10)
+func NewClient(loginData LoginData, brokerDomain string, defaultTimeoutDuration time.Duration, ssid ...string) *Client {
+	newClient := &Client{
+		brokerEndpoints:         		getEndpointsByBrokerDomain(brokerDomain),
+		session:                		NewSession(loginData),
+		defaultTimeoutDuration: 		defaultTimeoutDuration,
+		onTradeClosedCallback:  		make(map[int]func(tradeData TradeData)),
+	}
+
+	if len(ssid) > 0 && ssid[0] != "" {
+		newClient.session.SSID = ssid[0]
+	}
+
+	return newClient
+}
+
+// Get all balances. These balances are kept updated by subscription to 'balance-changed' event
+// Call GetUpdatedBalances if you need to really ensure that the balances are up-to-date
+func (c *Client) GetBalances() Balances {
+	return c.balances
+}
+
+// Get balance by type
+func (c *Client) GetBalance(type_ BalanceType) (Balance, error) {
+	return c.balances.FindByType(type_)
+}
+
+// Get session data
+func (c *Client) GetSession() Session {
+	return c.session
+}
+
+// Get broker host domain like 'iqoption.com'
+func (c *Client) GetBrokerDomain() string {
+	return c.brokerEndpoints.Domain
+}
+
+// Get timestamp that is kept updated by the 'timesync' event
+func (c *Client) GetTimestamp() int64 {
+	return c.serverTimestamp
+}
+
+// Get default timeout duration
+func (c *Client) GetDefaultTimeoutDuration() time.Duration {
+	return c.defaultTimeoutDuration
+}
+
+// Returns true if 'timeSync' event has been received and handled at least once
+func (c *Client) IsReady() bool {
+	return c.serverTimestamp != 0
+}
+
+// Returns true if the websocket connection not closed
+func (c *Client) IsConnectionOK() bool {
+	if c.ws == nil {
+		return false
+	}
+
+	return c.ws.IsConnectionOK()
+}
+
+// It is safe to call this function even if the connection is already closed
+func (c *Client) CloseConnection() {
+	if c.ws == nil || c.ws.Closed {
 		return
 	}
 
-	fmt.Println(a...)
+	c.ws.Close()
 }
 
-func (c Condition) Printf(format string, a ...any) {
-	if !c {
-		return
-	}
-
-	fmt.Printf(format, a...)
-}
-
-func (c Condition) PrintAsJSON(data interface{}) {
-	if !c {
-		return
-	}
-
-	PrintAsJSON(data)
-}
-
-func isVerbose() Condition {
-	if len(os.Args) < 2 {
-		return Condition(false)
-	}
-
-	verbose := strings.ToLower(os.Args[1]) == "--verbose=all"
-
-	if verbose {
-		fmt.Println("Verbose mode enabled")
-	}
-
-	return Condition(verbose)
+func (c *Client) getTimeout() time.Duration {
+	return c.defaultTimeoutDuration
 }
