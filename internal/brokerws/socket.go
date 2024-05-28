@@ -17,12 +17,11 @@ type EventCallback func(event []byte)
 type WebSocket struct {
 	Conn               *websocket.Conn
 	Closed             bool
-	eventHandlers      map[string]EventCallback
-	eventHandlersMutex sync.RWMutex
-	WaitGroup          *sync.WaitGroup
+	eventHandlers      sync.Map
+	WaitGroup          sync.WaitGroup
 }
 
-func NewSocketConnection(url string, timeoutDuration time.Duration, onLoseConnection func()) (*WebSocket, error) {
+func NewSocketConnection(url string, timeoutDuration time.Duration) (*WebSocket, error) {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second)
 	defer ctxCancel()
 
@@ -48,17 +47,17 @@ func NewSocketConnection(url string, timeoutDuration time.Duration, onLoseConnec
 	conn.SetReadLimit(-1)
 
 	newSocketConnection := &WebSocket{
-		eventHandlers: make(map[string]EventCallback),
+		eventHandlers: sync.Map{},
 		Conn:          conn,
 		Closed:        false,
-		WaitGroup:     new(sync.WaitGroup),
+		WaitGroup:     sync.WaitGroup{},
 	}
 
 	debug.IfVerbose.Println("new socket connection: ")
 
 	newSocketConnection.WaitGroup.Add(1)
 
-	go newSocketConnection.Listen(timeoutDuration, onLoseConnection)
+	go newSocketConnection.Listen(timeoutDuration)
 
 	return newSocketConnection, nil
 }
@@ -72,18 +71,14 @@ func (ws *WebSocket) Close() {
 	ws.Closed = true
 }
 
-func (ws *WebSocket) Listen(timeoutDuration time.Duration, onLoseConnection func()) {
+func (ws *WebSocket) Listen(timeoutDuration time.Duration) {
 	const maxErrorCount = 5
 	var errorCount int
 
+	defer ws.WaitGroup.Done()
+
 	for ws.IsConnectionOK() {
 		ctx, cancel := context.WithTimeout(context.Background(), timeoutDuration)
-		defer cancel()
-
-		if errorCount > maxErrorCount {
-			debug.IfVerbose.Println("too many errors, closing ws connection")
-			break
-		}
 
 		_, message, err := ws.Conn.Read(ctx)
 		cancel()
@@ -96,6 +91,10 @@ func (ws *WebSocket) Listen(timeoutDuration time.Duration, onLoseConnection func
 
 			debug.IfVerbose.Println("error reading ws event:", err)
 			errorCount++
+			if errorCount > maxErrorCount {
+				debug.IfVerbose.Println("too many errors, closing ws connection")
+				break
+			}
 			continue
 		}
 
@@ -107,5 +106,4 @@ func (ws *WebSocket) Listen(timeoutDuration time.Duration, onLoseConnection func
 
 	ws.Conn.Close(websocket.StatusAbnormalClosure, "close")
 	ws.Closed = true
-	onLoseConnection()
 }
