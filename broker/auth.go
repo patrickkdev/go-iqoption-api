@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/patrickkdev/Go-IQOption-API/internal/brokerws"
+	"github.com/patrickkdev/Go-IQOption-API/internal/tjson"
+	"github.com/patrickkdev/Go-IQOption-API/internal/types"
 )
 
 type LoginData struct {
