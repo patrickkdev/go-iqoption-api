@@ -18,36 +18,29 @@ func (ws *WebSocket) Subscribe(event any, responseEventName string, callback Eve
 
 func (ws *WebSocket) Emit(event any) {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*15)
+	defer	ctxCancel()
 
 	wsjson.Write(ctx, ws.Conn, event)
-	ctxCancel()
 }
 
-func (ws *WebSocket) EmitWithResponse(event any, responseEventName string, timeout time.Time) (resp []byte, err error) {
+func (ws *WebSocket) EmitWithResponse(event any, responseEventName string, timeout time.Duration) (resp []byte, err error) {
 	ws.Emit(event)
 
+	ch := make(chan []byte)
 	ws.AddEventListener(responseEventName, func(responseEvent []byte) {
-		resp = responseEvent
+		ch <- responseEvent
 	})
-
 	debug.IfVerbose.Println("waiting for " + responseEventName + "...")
 
-	for {
-		if !ws.IsConnectionOK() {
-			err = fmt.Errorf("websocket connection closed :: func EmitWithResponse (" + responseEventName + ")")
-			break
-		}
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 
-		if time.Now().After(timeout) {
-			err = fmt.Errorf("timed out waiting for response: " + responseEventName)
-			debug.IfVerbose.Println(err.Error())
-			break
-		}
-
-		if resp != nil {
+	select {
+	case resp = <-ch:
 			debug.IfVerbose.Println("Received '" + responseEventName + "' event")
-			break
-		}
+	case <-ctx.Done():
+			err = fmt.Errorf("timed out waiting for response: %s", responseEventName)
+			debug.IfVerbose.Println(err.Error())
 	}
 
 	ws.RemoveEventListener(responseEventName)
@@ -60,15 +53,11 @@ func (ws *WebSocket) EmitWithResponse(event any, responseEventName string, timeo
 }
 
 func (ws *WebSocket) AddEventListener(name string, callback EventCallback) {
-	ws.eventHandlersMutex.Lock()
-	ws.eventHandlers[name] = callback
-	ws.eventHandlersMutex.Unlock()
+	ws.eventHandlers.Store(name, callback)
 }
 
 func (ws *WebSocket) RemoveEventListener(name string) {
-	ws.eventHandlersMutex.Lock()
-	delete(ws.eventHandlers, name)
-	ws.eventHandlersMutex.Unlock()
+	ws.eventHandlers.Delete(name)
 }
 
 func (ws *WebSocket) handleEvent(eventB []byte) {
@@ -78,22 +67,29 @@ func (ws *WebSocket) handleEvent(eventB []byte) {
 
 	event := new(struct {
 		Name   string `json:"name"`
-		Result any    `json:"result"`
 	})
 
 	err := json.Unmarshal(eventB, &event)
+
+	// Ignore heartbeat events
+	if event.Name == "heartbeat" {
+		return
+	}
 
 	if err != nil {
 		reportEventError("error unmarshalling event")
 		return
 	}
 
-	ws.eventHandlersMutex.Lock()
-	callback, ok := ws.eventHandlers[event.Name]
-	ws.eventHandlersMutex.Unlock()
-
+	value, ok := ws.eventHandlers.Load(event.Name)
 	if !ok {
 		reportEventError("no callback found for event: " + event.Name)
+		return
+	}
+
+	callback, ok := value.(EventCallback)
+	if !ok {
+		reportEventError("invalid callback type for event: " + event.Name)
 		return
 	}
 
