@@ -4,7 +4,12 @@ import (
 	"time"
 
 	"github.com/patrickkdev/Go-IQOption-API/internal/brokerws"
+	"github.com/patrickkdev/Go-IQOption-API/internal/debug"
 )
+
+func SetVerbose(verbose bool) {
+	debug.IfVerbose = debug.Condition(verbose)
+}
 
 type Client struct {
 	balances 								Balances
