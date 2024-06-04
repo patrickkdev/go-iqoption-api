@@ -2,13 +2,11 @@ package debug
 
 import (
 	"fmt"
-	"os"
-	"strings"
 )
 
 type Condition bool
 
-var IfVerbose Condition = isVerbose()
+var IfVerbose Condition = false
 
 func If(condition bool) Condition {
 	return Condition(condition)
@@ -36,18 +34,4 @@ func (c Condition) PrintAsJSON(data interface{}) {
 	}
 
 	PrintAsJSON(data)
-}
-
-func isVerbose() Condition {
-	if len(os.Args) < 2 {
-		return Condition(false)
-	}
-
-	verbose := strings.ToLower(os.Args[1]) == "--verbose=all"
-
-	if verbose {
-		fmt.Println("Verbose mode enabled")
-	}
-
-	return Condition(verbose)
 }
