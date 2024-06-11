@@ -66,6 +66,7 @@ func (c *Client) ConnectSocket() error {
 
 	c.ws = newSocketConn
 
+	c.startAnsweringHeartBeats()
 	c.keepServerTimestampUpdated()
 
 	// Handle authentication
@@ -121,4 +122,3 @@ func (c *Client) authenticate() (*types.AuthenticationResponse, error) {
 
 	return &responseEvent, nil
 }
-
