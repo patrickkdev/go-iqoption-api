@@ -29,7 +29,7 @@ type Balance struct {
 	Amount            float64     `json:"amount"`
 	EnrolledAmount    float64     `json:"enrolled_amount"`
 	EnrolledSumAmount float64     `json:"enrolled_sum_amount"`
-	BonusAmount       int         `json:"bonus_amount"`
+	BonusAmount       float64     `json:"bonus_amount"`
 	HoldAmount        int         `json:"hold_amount"`
 	OrdersAmount      int         `json:"orders_amount"`
 	Currency          string      `json:"currency"`
