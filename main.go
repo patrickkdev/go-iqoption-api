@@ -14,6 +14,8 @@ func main() {
 		Password: "Junio020499",
 	}
 
+	broker.SetVerbose(true)
+
 	// Mock host name
 	hostName := "trade.exnova.com"
 
@@ -24,7 +26,7 @@ func main() {
 	err := client.Login()
 	if err != nil {
 		fmt.Printf("Login failed: %v\n", err)
-	}  
+	}
 
 	err = client.ConnectSocket()
 	if err != nil {

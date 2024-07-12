@@ -18,12 +18,15 @@ func (ws *WebSocket) Subscribe(event any, responseEventName string, callback Eve
 
 func (ws *WebSocket) Emit(event any) {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*15)
-	defer	ctxCancel()
+	defer ctxCancel()
 
 	wsjson.Write(ctx, ws.Conn, event)
 }
 
 func (ws *WebSocket) EmitWithResponse(event any, responseEventName string, timeout time.Duration) (resp []byte, err error) {
+	debug.IfVerbose.Println("Emiting event: ")
+	debug.IfVerbose.PrintAsJSON(event)
+
 	ws.Emit(event)
 
 	ch := make(chan []byte)
@@ -37,10 +40,10 @@ func (ws *WebSocket) EmitWithResponse(event any, responseEventName string, timeo
 
 	select {
 	case resp = <-ch:
-			debug.IfVerbose.Println("Received '" + responseEventName + "' event")
+		debug.IfVerbose.Println("Received '" + responseEventName + "' event")
 	case <-ctx.Done():
-			err = fmt.Errorf("timed out waiting for response: %s", responseEventName)
-			debug.IfVerbose.Println(err.Error())
+		err = fmt.Errorf("timed out waiting for response: %s", responseEventName)
+		debug.IfVerbose.Println(err.Error())
 	}
 
 	ws.RemoveEventListener(responseEventName)
@@ -66,7 +69,7 @@ func (ws *WebSocket) handleEvent(eventB []byte) {
 	}
 
 	event := new(struct {
-		Name   string `json:"name"`
+		Name string `json:"name"`
 	})
 
 	err := json.Unmarshal(eventB, &event)

@@ -192,7 +192,7 @@ type TradeBinaryResponseEvent struct {
 		UserID             int64       `json:"user_id"`
 		ID                 int         `json:"id"`
 		RefundValue        int64       `json:"refund_value"`
-		Price              int64       `json:"price"`
+		Price              float64     `json:"price"`
 		Exp                int64       `json:"exp"`
 		Created            int64       `json:"created"`
 		CreatedMillisecond int64       `json:"created_millisecond"`

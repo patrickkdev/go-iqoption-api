@@ -65,9 +65,6 @@ func (c *Client) openDigitalTrade(amount float64, direction TradeDirection, acti
 		},
 	}.WithRandomRequestId()
 
-	debug.IfVerbose.Println("requestEvent:")
-	debug.IfVerbose.PrintAsJSON(requestEvent)
-
 	resp, err := c.ws.EmitWithResponse(requestEvent, "digital-option-placed", c.getTimeout())
 	if err != nil {
 		return 0, err
@@ -78,8 +75,7 @@ func (c *Client) openDigitalTrade(amount float64, direction TradeDirection, acti
 		return 0, err
 	}
 
-	debug.IfVerbose.Println("responseEvent:")
-	debug.IfVerbose.PrintAsJSON(responseEvent)
+	debug.IfVerbose.PrintAsJSON(map[string]any{"responseEvent": responseEvent})
 
 	if responseEvent.Msg.ID == 0 {
 		return 0, fmt.Errorf("error placing trade")
@@ -122,8 +118,7 @@ func (c *Client) openBinaryTrade(amount float64, direction TradeDirection, activ
 		return 0, err
 	}
 
-	debug.IfVerbose.Println("responseEvent:")
-	debug.IfVerbose.PrintAsJSON(responseEvent)
+	debug.IfVerbose.PrintAsJSON(map[string]any{"responseEvent": responseEvent})
 
 	if responseEvent.Msg.ID == 0 {
 		return 0, fmt.Errorf("error placing trade")

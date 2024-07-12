@@ -17,6 +17,7 @@ func (c Condition) Println(a ...any) {
 		return
 	}
 
+	fmt.Print("$API: ")
 	fmt.Println(a...)
 }
 
@@ -25,6 +26,7 @@ func (c Condition) Printf(format string, a ...any) {
 		return
 	}
 
+	fmt.Print("$API: ")
 	fmt.Printf(format, a...)
 }
 
@@ -33,5 +35,5 @@ func (c Condition) PrintAsJSON(data interface{}) {
 		return
 	}
 
-	PrintAsJSON(data)
+	PrintAsJSON(map[string]interface{}{"$API": data})
 }
