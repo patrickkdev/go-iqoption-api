@@ -88,8 +88,8 @@ func (c *Client) openBinaryTrade(amount float64, direction TradeDirection, activ
 	exp, idx := getExpirationTime(c.serverTimestamp, duration)
 
 	optionTypeID := map[bool]int{
-		true:  3, // turbo
-		false: 1, // binary
+		true:  map[bool]int{true: 12, false: 3}[c.GetBrokerDomain() == "trade.bull-ex.com"], // turbo
+		false: 1,                                                                            // binary
 	}[idx < 5]
 
 	requestEvent := requestEvent{
@@ -103,6 +103,7 @@ func (c *Client) openBinaryTrade(amount float64, direction TradeDirection, activ
 				"expired":         exp,
 				"direction":       direction,
 				"option_type_id":  optionTypeID,
+				"expiration_size": duration * 60,
 				"user_balance_id": targetBalanceID,
 			},
 		},
