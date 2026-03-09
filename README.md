@@ -12,7 +12,7 @@ Feel free to use this as a reference, a starting point, or a building block for 
 
 ## Status
 
-The current state is uncertain, as it has been a while since this was last used in production. It should still work for the most part, and there likely aren’t too many changes required. Expect occasional breakage when Quadcore updates their protocols.
+The current state is uncertain, as it has been a while since this was last used in production. It should still work for the most part, and there likely aren’t too many changes required.
 
 ## Supported Brokers
 
